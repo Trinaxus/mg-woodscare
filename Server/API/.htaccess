@@ -1,0 +1,16 @@
+# API-Konfiguration
+# CORS und PHP-Handler
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # PHP-Handler für alle .php Dateien
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^(.*)\.php$ $1.php [L]
+</IfModule>

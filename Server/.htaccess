@@ -1,0 +1,39 @@
+# Server-Konfiguration für API
+# Aktiviert CORS und sichere Einstellungen
+
+<IfModule mod_headers.c>
+    # CORS für alle Anfragen
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+    
+    # Sicherheits-Header
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # OPTIONS-Anfragen direkt erlauben
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ index.php [L]
+</IfModule>
+
+# PHP-Einstellungen
+<IfModule mod_php.c>
+    php_value upload_max_filesize 5M
+    php_value post_max_size 5M
+    php_value max_execution_time 30
+    php_value memory_limit 128M
+</IfModule>
+
+# Verzeichnisschutz
+<Files "content.json">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+# Keine Directory-Listing
+Options -Indexes

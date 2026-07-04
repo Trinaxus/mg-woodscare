@@ -1,0 +1,186 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * MG Woodscare – Naturthema in Hell & Dunkel.
+ * Erd- und Waldtöne, warmes Moos-Grün, Rinde, Bernstein.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-moss: var(--moss);
+  --color-bark: var(--bark);
+  --color-amber-warm: var(--amber-warm);
+  --color-forest: var(--forest);
+
+  --font-display: "Fraunces", "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* LIGHT — warmes Papier, Moos, Rinde */
+:root {
+  --radius: 0.75rem;
+
+  --background: oklch(0.94 0.025 75);
+  --foreground: oklch(0.22 0.02 60);
+
+  --card: oklch(0.97 0.02 78);
+  --card-foreground: oklch(0.22 0.02 60);
+
+  --popover: oklch(0.97 0.02 78);
+  --popover-foreground: oklch(0.22 0.02 60);
+
+  --primary: oklch(0.5 0.11 145);
+  --primary-foreground: oklch(0.98 0.005 90);
+
+  --secondary: oklch(0.89 0.03 70);
+  --secondary-foreground: oklch(0.28 0.03 60);
+
+  --muted: oklch(0.90 0.025 72);
+  --muted-foreground: oklch(0.45 0.02 65);
+
+  --accent: oklch(0.6 0.11 55);
+  --accent-foreground: oklch(0.98 0.005 90);
+
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0.005 90);
+
+  --border: oklch(0.82 0.025 72);
+  --input: oklch(0.88 0.02 75);
+  --ring: oklch(0.5 0.11 145);
+
+  --moss: oklch(0.5 0.11 145);
+  --forest: oklch(0.38 0.09 145);
+  --bark: oklch(0.35 0.04 55);
+  --amber-warm: oklch(0.68 0.13 60);
+
+  --gradient-forest: linear-gradient(
+    180deg,
+    oklch(0.94 0.025 75 / 0.1) 0%,
+    oklch(0.94 0.025 75 / 0.55) 55%,
+    oklch(0.94 0.025 75 / 0.92) 100%
+  );
+  --gradient-moss: linear-gradient(135deg, var(--moss) 0%, var(--forest) 100%);
+  --gradient-amber: linear-gradient(135deg, var(--amber-warm) 0%, var(--bark) 100%);
+  --shadow-deep: 0 20px 60px -20px oklch(0.35 0.04 55 / 0.35);
+  --shadow-glow: 0 0 60px -10px oklch(0.5 0.11 145 / 0.3);
+  --shadow-card: 0 8px 32px -12px oklch(0.35 0.04 55 / 0.25);
+}
+
+/* DARK — tiefe Erde, sanftes Moos */
+.dark {
+  --background: oklch(0.18 0.018 80);
+  --foreground: oklch(0.94 0.02 90);
+
+  --card: oklch(0.22 0.02 80);
+  --card-foreground: oklch(0.94 0.02 90);
+
+  --popover: oklch(0.22 0.02 80);
+  --popover-foreground: oklch(0.94 0.02 90);
+
+  --primary: oklch(0.68 0.14 140);
+  --primary-foreground: oklch(0.16 0.02 90);
+
+  --secondary: oklch(0.28 0.025 70);
+  --secondary-foreground: oklch(0.94 0.02 90);
+
+  --muted: oklch(0.26 0.02 70);
+  --muted-foreground: oklch(0.72 0.02 85);
+
+  --accent: oklch(0.62 0.12 55);
+  --accent-foreground: oklch(0.16 0.02 90);
+
+  --destructive: oklch(0.6 0.2 25);
+  --destructive-foreground: oklch(0.98 0.005 90);
+
+  --border: oklch(0.32 0.02 75 / 60%);
+  --input: oklch(0.3 0.02 75);
+  --ring: oklch(0.68 0.14 140);
+
+  --moss: oklch(0.68 0.14 140);
+  --forest: oklch(0.42 0.09 145);
+  --bark: oklch(0.32 0.04 55);
+  --amber-warm: oklch(0.72 0.14 65);
+
+  --gradient-forest: linear-gradient(
+    180deg,
+    oklch(0.18 0.018 80 / 0.2) 0%,
+    oklch(0.14 0.015 80 / 0.85) 60%,
+    oklch(0.12 0.01 80) 100%
+  );
+  --shadow-deep: 0 20px 60px -20px oklch(0 0 0 / 0.6);
+  --shadow-glow: 0 0 60px -10px oklch(0.68 0.14 140 / 0.35);
+  --shadow-card: 0 8px 32px -12px oklch(0 0 0 / 0.5);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility bg-gradient-forest {
+  background-image: var(--gradient-forest);
+}
+@utility bg-gradient-moss {
+  background-image: var(--gradient-moss);
+}
+@utility bg-gradient-amber {
+  background-image: var(--gradient-amber);
+}
+@utility shadow-deep {
+  box-shadow: var(--shadow-deep);
+}
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+@utility text-balance {
+  text-wrap: balance;
+}
