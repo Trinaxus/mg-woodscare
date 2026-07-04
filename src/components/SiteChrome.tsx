@@ -1,20 +1,30 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Instagram, Phone, X } from "lucide-react";
+import { Instagram, Phone, X, Menu } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { ApiStatus } from "./ApiStatus";
 import { useContent } from "@/lib/content";
 import logo from "@/assets/logo_005.png";
 
 const nav = [
-  { href: "/leistungen", label: "Leistungen" },
-  { href: "/#ueber-uns", label: "Über uns" },
-  { href: "/referenzen", label: "Referenzen" },
-  { href: "/kontakt", label: "Kontakt" },
+  { to: "/leistungen", label: "Leistungen" },
+  { to: "/#ueber-uns", label: "Über uns", hash: "ueber-uns" },
+  { to: "/referenzen", label: "Referenzen" },
+  { to: "/kontakt", label: "Kontakt" },
 ];
+
+function handleHashScroll(hash: string) {
+  setTimeout(() => {
+    const el = document.getElementById(hash);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, 50);
+}
 
 export function SiteHeader() {
   const { content } = useContent();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <header className="fixed top-0 z-50 w-full border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-2">
@@ -29,11 +39,22 @@ export function SiteHeader() {
           </span>
         </Link>
         <nav className="hidden gap-8 text-sm text-muted-foreground md:flex">
-          {nav.map((n) => (
-            <a key={n.href} href={n.href} className="transition-colors hover:text-primary">
-              {n.label}
-            </a>
-          ))}
+          {nav.map((n) =>
+            n.hash ? (
+              <Link
+                key={n.to}
+                to="/"
+                onClick={() => handleHashScroll(n.hash)}
+                className="transition-colors hover:text-primary"
+              >
+                {n.label}
+              </Link>
+            ) : (
+              <Link key={n.to} to={n.to} className="transition-colors hover:text-primary">
+                {n.label}
+              </Link>
+            )
+          )}
         </nav>
         <div className="flex items-center gap-2">
           <a
@@ -46,14 +67,77 @@ export function SiteHeader() {
             <Instagram className="h-4 w-4" />
           </a>
           <ThemeToggle />
-          <a
-            href="/kontakt"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]"
+          <Link
+            to="/kontakt"
+            className="hidden sm:inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]"
           >
             <Phone className="h-4 w-4" /> Angebot
-          </a>
+          </Link>
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="grid h-9 w-9 place-items-center rounded-full border border-border bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:text-primary md:hidden"
+            aria-label="Menü öffnen"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
         </div>
       </div>
+
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div
+            className="absolute right-0 top-0 h-full w-72 max-w-[80vw] border-l border-border bg-background p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-6 flex items-center justify-between">
+              <span className="font-display text-lg font-semibold">Menü</span>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="grid h-8 w-8 place-items-center rounded-full border border-border bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+                aria-label="Menü schließen"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <nav className="flex flex-col gap-4">
+              {nav.map((n) =>
+                n.hash ? (
+                  <Link
+                    key={n.to}
+                    to="/"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleHashScroll(n.hash);
+                    }}
+                    className="rounded-lg border border-border bg-card/50 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+                  >
+                    {n.label}
+                  </Link>
+                ) : (
+                  <Link
+                    key={n.to}
+                    to={n.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-lg border border-border bg-card/50 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+                  >
+                    {n.label}
+                  </Link>
+                )
+              )}
+              <Link
+                to="/kontakt"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]"
+              >
+                <Phone className="h-4 w-4" /> Angebot
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

@@ -2,6 +2,13 @@
 # CORS und PHP-Handler
 
 <IfModule mod_headers.c>
+    # Vorher alle CORS-Header entfernen, falls doppelt gesetzt
+    Header always unset Access-Control-Allow-Origin
+    Header always unset Access-Control-Allow-Methods
+    Header always unset Access-Control-Allow-Headers
+    Header always unset Access-Control-Max-Age
+
+    # Neu setzen
     Header always set Access-Control-Allow-Origin "*"
     Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
     Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
