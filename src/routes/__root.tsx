@@ -1,5 +1,5 @@
 import { Outlet, Link, createRootRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useContent } from "../lib/content";
 
 function NotFoundComponent() {
@@ -63,6 +63,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const { isLoading, apiError } = useContent();
+  const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
     // Theme initialisieren
@@ -76,7 +77,17 @@ function RootComponent() {
     }
   }, []);
 
-  if (isLoading) {
+  // Max. 3 Sekunden Lade-Screen anzeigen, damit App nicht hängt
+  useEffect(() => {
+    if (!isLoading) {
+      setShowLoader(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowLoader(false), 3000);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
+  if (showLoader) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="text-center">
