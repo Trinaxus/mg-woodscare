@@ -3,9 +3,9 @@
  * Content API - GET, POST, PUT für SiteContent
  * 
  * Endpoints:
- * GET  /Server/API/content.php  - Lädt aktuellen Content
- * POST /Server/API/content.php  - Speichert neuen Content
- * PUT  /Server/API/content.php  - Aktualisiert Content
+ * GET  /server/api/content.php  - Lädt aktuellen Content
+ * POST /server/api/content.php  - Speichert neuen Content
+ * PUT  /server/api/content.php  - Aktualisiert Content
  */
 
 header('Content-Type: application/json');
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$dataDir = __DIR__ . '/../Data';
+$dataDir = __DIR__ . '/../data';
 $contentFile = $dataDir . '/content.json';
 
 // Data-Verzeichnis erstellen falls nicht vorhanden

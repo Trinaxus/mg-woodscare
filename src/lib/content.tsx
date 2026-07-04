@@ -2,11 +2,9 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { defaultContent, type SiteContent } from "@/data/defaultContent";
 import { api } from "./api";
 
-const STORAGE_KEY = "mgw:content";
 const THEME_KEY = "mgw:theme";
 const ADMIN_PASS_KEY = "mgw:adminPass";
 const ADMIN_SESSION_KEY = "mgw:adminSession";
-const API_MODE_KEY = "mgw:apiMode";
 
 export const DEFAULT_ADMIN_PASSWORD = "waldmeister";
 
@@ -25,41 +23,46 @@ interface ContentCtx {
   logoutAdmin: () => void;
   apiMode: boolean;
   toggleApiMode: () => void;
-  saveToApi: () => Promise<void>;
+  saveToApi: (data?: SiteContent) => Promise<void>;
   loadFromApi: () => Promise<void>;
+  isLoading: boolean;
+  apiError: string | null;
 }
 
 const Ctx = createContext<ContentCtx | null>(null);
-
-function loadJSON<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return fallback;
-    return { ...(fallback as object), ...JSON.parse(raw) } as T;
-  } catch {
-    return fallback;
-  }
-}
 
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [content, setContentState] = useState<SiteContent>(defaultContent);
   const [theme, setTheme] = useState<Theme>("dark");
   const [adminPassword, setAdminPasswordState] = useState<string>(DEFAULT_ADMIN_PASSWORD);
   const [isAdminAuthed, setIsAdminAuthed] = useState<boolean>(false);
-  const [apiMode, setApiMode] = useState<boolean>(false);
+  const [apiMode] = useState<boolean>(true);
   const [hydrated, setHydrated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  // Hydrate from localStorage (client only)
+  // Lade Content immer vom externen Server
   useEffect(() => {
-    setContentState(loadJSON<SiteContent>(STORAGE_KEY, defaultContent));
+    const loadContent = async () => {
+      try {
+        const apiContent = await api.getContent<SiteContent>();
+        setContentState(apiContent);
+        setApiError(null);
+      } catch (error) {
+        console.error("Content Load Error:", error);
+        setApiError("API nicht erreichbar. Daten werden aus Fallback geladen.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadContent();
     const storedTheme = (window.localStorage.getItem(THEME_KEY) as Theme | null) ?? "dark";
     setTheme(storedTheme);
     setAdminPasswordState(
       window.localStorage.getItem(ADMIN_PASS_KEY) ?? DEFAULT_ADMIN_PASSWORD
     );
     setIsAdminAuthed(window.sessionStorage.getItem(ADMIN_SESSION_KEY) === "1");
-    setApiMode(window.localStorage.getItem(API_MODE_KEY) === "true");
     setHydrated(true);
   }, []);
 
@@ -74,14 +77,10 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   const setContent = (c: SiteContent) => {
     setContentState(c);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(c));
-    }
   };
 
   const resetContent = () => {
     setContentState(defaultContent);
-    if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
   };
 
   const setAdminPassword = (p: string) => {
@@ -106,18 +105,16 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
   const toggleApiMode = () => {
-    const newMode = !apiMode;
-    setApiMode(newMode);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(API_MODE_KEY, String(newMode));
-    }
+    // API-Mode ist immer aktiv - Admin greift immer auf externen Server zu
+    console.warn("API-Mode ist immer aktiv");
   };
 
-  const saveToApi = async () => {
+  const saveToApi = async (data?: SiteContent) => {
     try {
-      await api.saveContent(content);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+      await api.saveContent(data ?? content);
+      // Nach erfolgreichem Speichern auch den lokalen State aktualisieren
+      if (data) {
+        setContentState(data);
       }
     } catch (error) {
       console.error("API Save Error:", error);
@@ -126,15 +123,17 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   };
 
   const loadFromApi = async () => {
+    setIsLoading(true);
+    setApiError(null);
     try {
       const apiContent = await api.getContent<SiteContent>();
       setContentState(apiContent);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(apiContent));
-      }
     } catch (error) {
       console.error("API Load Error:", error);
+      setApiError("API nicht erreichbar.");
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -154,9 +153,11 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       toggleApiMode,
       saveToApi,
       loadFromApi,
+      isLoading,
+      apiError,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [content, theme, adminPassword, isAdminAuthed, apiMode]
+    [content, theme, adminPassword, isAdminAuthed, apiMode, isLoading, apiError]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

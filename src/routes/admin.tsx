@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Leaf, Cloud } from "lucide-react";
+import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud } from "lucide-react";
 
 import { SiteFooter } from "@/components/SiteChrome";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useContent, DEFAULT_ADMIN_PASSWORD } from "@/lib/content";
 import { defaultContent, type SiteContent } from "@/data/defaultContent";
+import logo from "@/assets/logo_005.png";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -54,9 +55,11 @@ function LoginScreen() {
         className="w-full max-w-md rounded-3xl border border-border bg-card p-8 shadow-card"
       >
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-moss">
-            <Leaf className="h-5 w-5 text-primary-foreground" />
-          </span>
+          <img
+            src={logo}
+            alt="MG Woodscare Logo"
+            className="h-10 w-10 rounded-full object-cover shadow-glow"
+          />
           <div>
             <p className="font-display text-2xl font-semibold">MG Woodscare · Admin</p>
             <p className="text-xs text-muted-foreground">Content-Verwaltung</p>
@@ -99,7 +102,7 @@ function LoginScreen() {
 }
 
 function AdminDashboard() {
-  const { content, setContent, resetContent, logoutAdmin, apiMode, toggleApiMode, saveToApi, loadFromApi } = useContent();
+  const { content, resetContent, logoutAdmin, apiMode, saveToApi, loadFromApi } = useContent();
   const [draft, setDraft] = useState<SiteContent>(content);
   const [tab, setTab] = useState<TabId>("hero");
   const [dirty, setDirty] = useState(false);
@@ -115,13 +118,8 @@ function AdminDashboard() {
   const save = async () => {
     setLoading(true);
     try {
-      if (apiMode) {
-        await saveToApi();
-        setNotice("Per API gespeichert!");
-      } else {
-        setContent(draft);
-        setNotice("Änderungen gespeichert.");
-      }
+      await saveToApi(draft);
+      setNotice("Per API gespeichert!");
       setDirty(false);
       setTimeout(() => setNotice(null), 2500);
     } catch (error) {
@@ -172,9 +170,13 @@ function AdminDashboard() {
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-4">
           <div className="flex items-center gap-3">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-moss">
-              <Leaf className="h-4 w-4 text-primary-foreground" />
-            </span>
+            <Link to="/" className="rounded-full transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+              <img
+                src={logo}
+                alt="MG Woodscare Logo"
+                className="h-12 w-12 rounded-full object-cover shadow-glow"
+              />
+            </Link>
             <div>
               <p className="font-display text-lg font-semibold leading-none">Admin</p>
               <p className="text-xs text-muted-foreground">MG Woodscare Content</p>
@@ -200,16 +202,9 @@ function AdminDashboard() {
             <ToolbarBtn onClick={() => fileRef.current?.click()} icon={Upload} label="Importieren" />
             <ToolbarBtn onClick={doExport} icon={Download} label="Exportieren" />
             <ToolbarBtn onClick={reset} icon={RotateCcw} label="Zurücksetzen" />
-            <button
-              onClick={toggleApiMode}
-              className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${
-                apiMode
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-card/60 text-muted-foreground hover:border-primary/50 hover:text-primary"
-              }`}
-            >
-              <Cloud className="h-3.5 w-3.5" /> {apiMode ? "API-Modus" : "Local-Modus"}
-            </button>
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
+              <Cloud className="h-3.5 w-3.5" /> API-Modus (aktiv)
+            </span>
             <ThemeToggle />
             <button
               onClick={save}

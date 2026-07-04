@@ -5,26 +5,26 @@
 Für die lokale Entwicklung ist die `.env` Datei bereits konfiguriert:
 
 ```env
-VITE_API_BASE_URL=/Server/API
+VITE_API_BASE_URL=/server/api
 ```
 
-Der `Server/` Ordner wird lokal für die API verwendet.
+Der `server/` Ordner wird lokal für die API verwendet.
 
 ## Externe Server Deployment
 
 ### 1. Server-Ordner hochladen
 
-Lade den gesamten `Server/` Ordner auf deinen externen Server hoch:
+Lade den gesamten `server/` Ordner auf deinen externen Server hoch:
 
 ```
 deine-domain.de/
-└── Server/
-    ├── API/
+└── server/
+    ├── api/
     │   ├── content.php
     │   ├── upload.php
     │   └── .htaccess
-    ├── Data/
-    ├── Upload/
+    ├── data/
+    ├── upload/
     └── .htaccess
 ```
 
@@ -43,12 +43,13 @@ Stelle sicher, dass dein Server PHP unterstützt und folgende Einstellungen hat:
 Setze die richtigen Berechtigungen:
 
 ```bash
-chmod 755 Server/
-chmod 755 Server/API/
-chmod 755 Server/Data/
-chmod 755 Server/Upload/
-chmod 644 Server/API/*.php
-chmod 644 Server/.htaccess
+chmod 755 server/
+chmod 755 server/api/
+chmod 755 server/data/
+chmod 755 server/upload/
+chmod 644 server/api/*.php
+chmod 644 server/.htaccess
+chmod 644 server/api/.htaccess
 ```
 
 ### 4. .env Datei anpassen
@@ -57,7 +58,7 @@ Passe die `.env` Datei im Projekt für den externen Server an:
 
 ```env
 # Externer Server
-VITE_API_BASE_URL=https://deine-domain.de/Server/API
+VITE_API_BASE_URL=https://deine-domain.de/server/api
 ```
 
 ### 5. Frontend neu bauen
@@ -75,12 +76,12 @@ Lade das gebaute Frontend auf deinen externen Server hoch.
 ## API Endpoints
 
 ### Content API
-- **GET** `https://deine-domain.de/Server/API/content.php` - Content laden
-- **POST** `https://deine-domain.de/Server/API/content.php` - Content speichern
-- **PUT** `https://deine-domain.de/Server/API/content.php` - Content aktualisieren
+- **GET** `https://deine-domain.de/server/api/content.php` - Content laden
+- **POST** `https://deine-domain.de/server/api/content.php` - Content speichern
+- **PUT** `https://deine-domain.de/server/api/content.php` - Content aktualisieren
 
 ### Upload API
-- **POST** `https://deine-domain.de/Server/API/upload.php` - Bild hochladen
+- **POST** `https://deine-domain.de/server/api/upload.php` - Bild hochladen
 
 ## Sicherheit
 
@@ -97,14 +98,14 @@ Für Produktionsumgebungen solltest du:
 Das Backend erstellt automatisch Backups der Content-Dateien:
 
 ```
-Server/Data/
+server/data/
 ├── content.json
 ├── content_backup_2026-07-04_11-30-00.json
 ├── content_backup_2026-07-04_12-15-30.json
-└── ...
+├── ...
 ```
 
-Regelmäßige Backups des `Server/Data/` Ordners werden empfohlen.
+Regelmäßige Backups des `server/data/` Ordners werden empfohlen.
 
 ## Troubleshooting
 
@@ -116,8 +117,9 @@ Regelmäßige Backups des `Server/Data/` Ordners werden empfohlen.
 ### CORS Fehler
 - Prüfe die CORS Header in den `.htaccess` Dateien
 - Prüfe ob die API URL korrekt in der `.env` Datei steht
+- Stelle sicher, dass die `.htaccess` CORS-Header mit `Header always set` gesetzt werden
 
 ### Upload funktioniert nicht
 - Prüfe die PHP Upload Limits
-- Prüfe die File Permissions im `Server/Upload/` Ordner
+- Prüfe die File Permissions im `server/upload/` Ordner
 - Prüfe die Dateigröße (max 5MB)

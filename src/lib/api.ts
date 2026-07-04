@@ -25,14 +25,15 @@ export class ApiClient {
 
   constructor(baseUrl?: string) {
     // Verwende Env-Variable oder Fallback
-    this.baseUrl = baseUrl || import.meta.env.VITE_API_BASE_URL || '/Server/API';
+    this.baseUrl = baseUrl || import.meta.env.VITE_API_BASE_URL || '/server/api';
   }
 
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseUrl}${endpoint}`;
+    const baseUrl = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
+    const url = `${baseUrl}${endpoint}`;
     
     try {
       const response = await fetch(url, {
@@ -44,6 +45,7 @@ export class ApiClient {
       });
 
       const data = await response.json();
+      console.log('API Response:', { url, status: response.status, data });
 
       if (!response.ok) {
         throw new Error(data.error || `HTTP ${response.status}`);
@@ -51,7 +53,7 @@ export class ApiClient {
 
       return data;
     } catch (error) {
-      console.error('API Error:', error);
+      console.error('API Error:', { url, error });
       throw error;
     }
   }

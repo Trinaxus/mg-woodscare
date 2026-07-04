@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Instagram, Phone, Leaf } from "lucide-react";
+import { Instagram, Phone, X } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { ApiStatus } from "./ApiStatus";
 import { useContent } from "@/lib/content";
 import logo from "@/assets/logo_005.png";
 
@@ -58,16 +60,49 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   const { content } = useContent();
+  const [showLogoModal, setShowLogoModal] = useState(false);
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 py-10 md:flex-row">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Leaf className="h-4 w-4 text-primary" />
+          <button
+            onClick={() => setShowLogoModal(true)}
+            className="rounded-full transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            aria-label="Logo in Originalgröße anzeigen"
+          >
+            <img
+              src={logo}
+              alt="MG Woodscare Logo"
+              className="h-8 w-8 rounded-full object-cover shadow-glow"
+            />
+          </button>
           <span>
             © {new Date().getFullYear()} {content.brand.name} {content.brand.accentName} – Baumpflege
             & Sägewerk Leipzig
           </span>
         </div>
+
+        {showLogoModal && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+            onClick={() => setShowLogoModal(false)}
+          >
+            <div className="relative max-h-[90vh] max-w-[90vw]">
+              <button
+                onClick={() => setShowLogoModal(false)}
+                className="absolute -right-3 -top-3 grid h-8 w-8 place-items-center rounded-full bg-background text-foreground shadow-lg transition-colors hover:bg-primary hover:text-primary-foreground"
+                aria-label="Schließen"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <img
+                src={logo}
+                alt="MG Woodscare Logo"
+                className="max-h-[85vh] max-w-[85vw] rounded-2xl object-contain shadow-2xl"
+              />
+            </div>
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
           <a
             href={content.instagram.url}
@@ -87,6 +122,7 @@ export function SiteFooter() {
           <Link to="/admin" className="hover:text-primary">
             Admin
           </Link>
+          <ApiStatus />
         </div>
       </div>
     </footer>

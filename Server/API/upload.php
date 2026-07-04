@@ -3,7 +3,7 @@
  * Image Upload API
  * 
  * Endpoints:
- * POST /Server/API/upload.php - Bild hochladen
+ * POST /server/api/upload.php - Bild hochladen
  */
 
 header('Content-Type: application/json');
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$uploadDir = __DIR__ . '/../Upload';
+$uploadDir = __DIR__ . '/../upload';
 
 // Upload-Verzeichnis erstellen falls nicht vorhanden
 if (!file_exists($uploadDir)) {
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Datei speichern
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
-        $url = '/Server/Upload/' . $filename;
+        $url = '/server/upload/' . $filename;
         echo json_encode([
             'success' => true,
             'message' => 'Bild erfolgreich hochgeladen',

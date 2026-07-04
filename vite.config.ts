@@ -16,7 +16,15 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 8080,
+    proxy: {
+      '/server/api': {
+        target: 'https://tubox.de',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/server\/api/, '/mg_woodscare/server/api'),
+      },
+    },
   },
   build: {
     outDir: "dist",
