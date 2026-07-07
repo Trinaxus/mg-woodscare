@@ -624,6 +624,76 @@ function SettingsTab({
 
       <div className="my-6 h-px bg-border" />
 
+      <p className="text-sm font-medium">Header- & Footer-Haarlinie</p>
+      <p className="text-sm text-muted-foreground">
+        Farbe, Deckkraft und Dicke der feinen Linie unter dem Header und über dem Footer.
+      </p>
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <div>
+          <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            Farbe
+          </label>
+          <div className="flex flex-wrap items-center gap-3">
+            <input
+              type="color"
+              value={draft.hairline?.color || "#22c55e"}
+              onChange={(e) => update("hairline", { ...(draft.hairline || {}), color: e.target.value })}
+              className="h-10 w-16 cursor-pointer rounded-xl border border-border bg-transparent"
+            />
+            <span className="text-sm font-mono text-muted-foreground">
+              {draft.hairline?.color || "Standard (Primary)"}
+            </span>
+            {draft.hairline?.color && (
+              <button
+                type="button"
+                onClick={() => update("hairline", { ...(draft.hairline || {}), color: "" })}
+                className="text-sm text-destructive hover:underline"
+              >
+                Standard
+              </button>
+            )}
+          </div>
+        </div>
+        <div>
+          <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            Deckkraft: {Math.round((draft.hairline?.opacity ?? 1) * 100)}%
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={Math.round((draft.hairline?.opacity ?? 1) * 100)}
+            onChange={(e) =>
+              update("hairline", {
+                ...(draft.hairline || {}),
+                opacity: parseInt(e.target.value, 10) / 100,
+              })
+            }
+            className="h-10 w-full accent-primary"
+          />
+        </div>
+        <div>
+          <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            Dicke: {draft.hairline?.thickness ?? 0.5}px
+          </label>
+          <input
+            type="range"
+            min={1}
+            max={30}
+            value={Math.round((draft.hairline?.thickness ?? 0.5) * 10)}
+            onChange={(e) =>
+              update("hairline", {
+                ...(draft.hairline || {}),
+                thickness: parseInt(e.target.value, 10) / 10,
+              })
+            }
+            className="h-10 w-full accent-primary"
+          />
+        </div>
+      </div>
+
+      <div className="my-6 h-px bg-border" />
+
       <p className="text-sm text-muted-foreground">
         Aktuelles Passwort: <code className="rounded bg-muted px-1.5 py-0.5">{adminPassword}</code>
       </p>

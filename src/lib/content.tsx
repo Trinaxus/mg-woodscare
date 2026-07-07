@@ -2,6 +2,30 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { defaultContent, type SiteContent } from "@/data/defaultContent";
 import { api } from "./api";
 
+function deepMerge<T>(target: T, source: unknown): T {
+  if (!source || typeof source !== "object" || Array.isArray(source)) return target;
+  const result = { ...target } as Record<string, unknown>;
+  for (const key in source as Record<string, unknown>) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      const sourceValue = (source as Record<string, unknown>)[key];
+      const targetValue = result[key];
+      if (
+        sourceValue &&
+        typeof sourceValue === "object" &&
+        !Array.isArray(sourceValue) &&
+        targetValue &&
+        typeof targetValue === "object" &&
+        !Array.isArray(targetValue)
+      ) {
+        result[key] = deepMerge(targetValue, sourceValue);
+      } else if (sourceValue !== undefined) {
+        result[key] = sourceValue;
+      }
+    }
+  }
+  return result as T;
+}
+
 const THEME_KEY = "mgw:theme";
 const ADMIN_PASS_KEY = "mgw:adminPass";
 const ADMIN_SESSION_KEY = "mgw:adminSession";
@@ -46,7 +70,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     const loadContent = async () => {
       try {
         const apiContent = await api.getContent<SiteContent>();
-        setContentState({ ...defaultContent, ...apiContent });
+        setContentState(deepMerge(defaultContent, apiContent));
         setApiError(null);
       } catch (error) {
         console.error("Content Load Error:", error);
@@ -127,7 +151,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     setApiError(null);
     try {
       const apiContent = await api.getContent<SiteContent>();
-      setContentState({ ...defaultContent, ...apiContent });
+      setContentState(deepMerge(defaultContent, apiContent));
     } catch (error) {
       console.error("API Load Error:", error);
       setApiError("API nicht erreichbar.");

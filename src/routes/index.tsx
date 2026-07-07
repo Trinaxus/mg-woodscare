@@ -52,10 +52,10 @@ const iconMap: Record<string, LucideIcon> = {
 function LandingPage() {
   const { content } = useContent();
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-transparent text-foreground">
       <SiteHeader />
 
-      <main className="flex-1">
+      <main className="flex flex-1 flex-col">
       {/* HERO */}
       <section id="top" className="relative isolate overflow-hidden pt-24">
         <img
@@ -105,7 +105,7 @@ function LandingPage() {
         </div>
       </section>
 
-      <ContentBackground>
+      <ContentBackground className="flex-1">
       {/* STATS */}
       <section className="border-y border-border bg-card/40">
         <div className="mx-auto grid max-w-7xl grid-cols-2 divide-border md:grid-cols-4 md:divide-x">

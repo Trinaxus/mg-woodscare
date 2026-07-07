@@ -25,8 +25,19 @@ function handleHashScroll(hash: string) {
 export function SiteHeader() {
   const { content } = useContent();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const hairlineColor = content.hairline?.color || "hsl(var(--primary))";
+  const hairlineOpacity = content.hairline?.opacity ?? 1;
+  const hairlineThickness = content.hairline?.thickness ?? 0.5;
   return (
     <header className="fixed top-0 z-50 w-full border-b border-border/60 bg-background/70 backdrop-blur-xl">
+      <div
+        className="absolute inset-x-0 bottom-0"
+        style={{
+          height: `${hairlineThickness}px`,
+          backgroundImage: `linear-gradient(to right, transparent, ${hairlineColor}, transparent)`,
+          opacity: hairlineOpacity,
+        }}
+      />
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-2">
         <Link to="/" className="flex items-center gap-2 font-display text-xl font-semibold">
           <img
@@ -145,8 +156,19 @@ export function SiteHeader() {
 export function SiteFooter() {
   const { content } = useContent();
   const [showLogoModal, setShowLogoModal] = useState(false);
+  const hairlineColor = content.hairline?.color || "hsl(var(--primary))";
+  const hairlineOpacity = content.hairline?.opacity ?? 1;
+  const hairlineThickness = content.hairline?.thickness ?? 0.5;
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="relative bg-background">
+      <div
+        className="absolute inset-x-0 top-0"
+        style={{
+          height: `${hairlineThickness}px`,
+          backgroundImage: `linear-gradient(to right, transparent, ${hairlineColor}, transparent)`,
+          opacity: hairlineOpacity,
+        }}
+      />
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 py-10 md:flex-row">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <button

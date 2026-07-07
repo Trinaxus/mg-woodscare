@@ -16,6 +16,11 @@ export interface SiteContent {
     opacity?: number;
     color?: string;
   };
+  hairline: {
+    color?: string;
+    opacity?: number;
+    thickness?: number;
+  };
   hero: {
     eyebrow: string;
     titleLead: string;
@@ -55,6 +60,8 @@ export interface SiteContent {
     email: string;
     address: string;
     ownerLine: string;
+    processTitle: string;
+    processSteps: { number: string; title: string; text: string }[];
   };
   instagram: {
     handle: string;
@@ -98,6 +105,11 @@ export const defaultContent: SiteContent = {
     pattern: "",
     opacity: 0.08,
     color: "",
+  },
+  hairline: {
+    color: "",
+    opacity: 1,
+    thickness: 0.5,
   },
   hero: {
     eyebrow: "Baumpflegedienst · Sägewerk · Leipzig",
@@ -254,6 +266,14 @@ export const defaultContent: SiteContent = {
     email: "hmerkel01@googlemail.com",
     address: "Heckenweg 16, 04349 Leipzig",
     ownerLine: "Heiko Merkel · Baumpflegedienst",
+    processTitle: "So arbeiten wir mit Ihnen zusammen",
+    processSteps: [
+      { number: "01", title: "Anfrage", text: "Sie schildern uns die Situation, per Telefon, E-Mail oder über das Formular unten." },
+      { number: "02", title: "Vor-Ort-Termin", text: "Wir schauen uns Baum und Gelände gemeinsam an und beraten ehrlich, ob überhaupt etwas nötig ist." },
+      { number: "03", title: "Festes Angebot", text: "Sie bekommen eine klare Aussage zu Aufwand, Ablauf und Preis, ohne versteckte Posten." },
+      { number: "04", title: "Durchführung", text: "Fachgerecht und sicher, mit dem passenden Verfahren: Seiltechnik, Maschine oder Rückepferd." },
+      { number: "05", title: "Nachsorge", text: "Fläche aufgeräumt, Holz nach Wunsch verwertet oder als Kaminholz mitgenommen. Fertig." },
+    ],
   },
   instagram: {
     handle: "@mg_woodscare_baumpflegedienst_",

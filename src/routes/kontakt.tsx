@@ -54,6 +54,26 @@ function KontaktPage() {
         </section>
 
         <ContentBackground>
+        {/* ABLAUF */}
+        <section className="border-y border-border bg-card/40">
+          <div className="mx-auto max-w-7xl px-6 py-20">
+            <h2 className="text-center font-display text-3xl font-semibold md:text-4xl">
+              {content.kontakt.processTitle}
+            </h2>
+            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+              {content.kontakt.processSteps.map((step) => (
+                <div key={step.number} className="relative rounded-3xl border border-border bg-card p-6 shadow-card">
+                  <div className="font-display text-4xl font-semibold text-primary/40">
+                    {step.number}
+                  </div>
+                  <h3 className="mt-4 font-display text-xl font-semibold">{step.title}</h3>
+                  <p className="mt-3 text-sm text-foreground/75 leading-relaxed">{step.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* KONTAKT INFO */}
         <section className="border-y border-border bg-card/40">
           <div className="mx-auto max-w-7xl px-6 py-20">

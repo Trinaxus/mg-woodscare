@@ -46,10 +46,10 @@ const iconMap: Record<string, LucideIcon> = {
 function LeistungenPage() {
   const { content } = useContent();
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-transparent text-foreground">
       <SiteHeader />
 
-      <main className="flex-1">
+      <main className="flex flex-1 flex-col">
         {/* HERO */}
         <section className="relative isolate overflow-hidden pt-24">
           <img
@@ -81,7 +81,7 @@ function LeistungenPage() {
           </div>
         </section>
 
-        <ContentBackground>
+        <ContentBackground className="flex-1">
         {/* LEISTUNGEN */}
         <section className="border-y border-border bg-card/40">
           <div className="mx-auto max-w-7xl px-6 py-20">
