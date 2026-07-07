@@ -40,24 +40,24 @@ export function ScrollReveal({
     return () => observer.disconnect();
   }, [once]);
 
-  const base = "transition-all will-change-transform";
   const hidden: Record<string, string> = {
-    up: "opacity-0 translate-y-10",
-    down: "opacity-0 -translate-y-10",
-    left: "opacity-0 translate-x-10",
-    right: "opacity-0 -translate-x-10",
-    fade: "opacity-0",
+    up: "opacity-0 translate-y-8 scale-[0.985]",
+    down: "opacity-0 -translate-y-8 scale-[0.985]",
+    left: "opacity-0 translate-x-8 scale-[0.985]",
+    right: "opacity-0 -translate-x-8 scale-[0.985]",
+    fade: "opacity-0 scale-[0.985]",
   };
-  const shown = "opacity-100 translate-x-0 translate-y-0";
+  const shown = "opacity-100 translate-x-0 translate-y-0 scale-100";
 
   return (
     <div
       ref={ref}
-      className={`${base} ${visible ? shown : hidden[direction]} ${className}`}
+      className={`will-change-transform ${visible ? shown : hidden[direction]} ${className}`}
       style={{
+        transitionProperty: "opacity, transform",
         transitionDuration: `${duration}ms`,
         transitionDelay: `${delay}ms`,
-        transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+        transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
       }}
     >
       {children}
