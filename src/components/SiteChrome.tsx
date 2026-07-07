@@ -96,24 +96,23 @@ export function SiteHeader() {
 
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xl md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         >
           <div
-            className="absolute right-0 top-0 h-full w-72 max-w-[80vw] border-l border-border bg-background p-6 shadow-2xl"
+            className="absolute left-4 right-4 top-24 rounded-3xl border border-border bg-card/95 p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-6 flex items-center justify-between">
-              <span className="font-display text-lg font-semibold">Menü</span>
+            <div className="flex items-center justify-end">
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="grid h-8 w-8 place-items-center rounded-full border border-border bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+                className="grid h-9 w-9 place-items-center rounded-full border border-border bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:text-primary"
                 aria-label="Menü schließen"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <nav className="flex flex-col gap-4">
+            <nav className="mt-2 grid grid-cols-2 gap-3">
               {nav.map((n) =>
                 n.hash ? (
                   <Link
@@ -123,7 +122,7 @@ export function SiteHeader() {
                       setMobileMenuOpen(false);
                       handleHashScroll(n.hash);
                     }}
-                    className="rounded-lg border border-border bg-card/50 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+                    className="rounded-2xl border border-border bg-card/50 px-4 py-5 text-center text-sm font-semibold uppercase tracking-wider text-foreground transition-colors hover:border-primary/60 hover:text-primary"
                   >
                     {n.label}
                   </Link>
@@ -132,7 +131,7 @@ export function SiteHeader() {
                     key={n.to}
                     to={n.to}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-lg border border-border bg-card/50 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+                    className="rounded-2xl border border-border bg-card/50 px-4 py-5 text-center text-sm font-semibold uppercase tracking-wider text-foreground transition-colors hover:border-primary/60 hover:text-primary"
                   >
                     {n.label}
                   </Link>
@@ -141,11 +140,15 @@ export function SiteHeader() {
               <Link
                 to="/kontakt"
                 onClick={() => setMobileMenuOpen(false)}
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]"
+                className="col-span-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-4 text-sm font-semibold uppercase tracking-wider text-primary-foreground transition-transform hover:scale-[1.02]"
               >
                 <Phone className="h-4 w-4" /> Angebot
               </Link>
             </nav>
+            <div className="mt-5 flex items-center justify-between rounded-2xl border border-border bg-card/50 p-4">
+              <span className="text-sm font-medium">Erscheinungsbild</span>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       )}

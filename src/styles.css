@@ -184,3 +184,16 @@
 @utility text-balance {
   text-wrap: balance;
 }
+
+/* Sanfter Übergang zwischen Hell- und Dunkelmodus */
+html {
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+html *,
+html *::before,
+html *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 400ms;
+  transition-timing-function: ease-in-out;
+}
