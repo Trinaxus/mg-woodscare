@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { ContentBackground } from "@/components/BackgroundPattern";
 import { useContent } from "@/lib/content";
 
 export const Route = createFileRoute("/datenschutz")({
@@ -27,35 +28,39 @@ function DatenschutzPage() {
   const { content } = useContent();
   const d = content.datenschutz;
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-transparent text-foreground">
       <SiteHeader />
-      <main className="flex-1 mx-auto max-w-3xl px-6 pb-24 pt-40">
-        <span className="text-xs font-medium uppercase tracking-widest text-primary">
-          Rechtliches
-        </span>
-        <h1 className="mt-3 font-display text-5xl font-semibold">Datenschutz&shy;erklärung</h1>
+      <main className="flex flex-1 flex-col">
+        <ContentBackground className="flex-1 pb-24 pt-40">
+          <div className="mx-auto max-w-3xl px-6">
+            <span className="text-xs font-medium uppercase tracking-widest text-primary">
+              Rechtliches
+            </span>
+            <h1 className="mt-3 font-display text-5xl font-semibold">Datenschutz&shy;erklärung</h1>
 
-        <Section title="Allgemeines">
-          <p>{d.intro}</p>
-        </Section>
-        <Section title="Verantwortlich">
-          <p>{d.verantwortlich}</p>
-        </Section>
-        <Section title="Server-Logfiles">
-          <p>{d.serverLog}</p>
-        </Section>
-        <Section title="Kontaktformular & E-Mail">
-          <p>{d.kontaktformular}</p>
-        </Section>
-        <Section title="Cookies">
-          <p>{d.cookies}</p>
-        </Section>
-        <Section title="Ihre Rechte">
-          <p>{d.rechte}</p>
-        </Section>
-        <Section title="Datenschutz-Ansprechpartner">
-          <p>{d.kontaktStelle}</p>
-        </Section>
+            <Section title="Allgemeines">
+              <p>{d.intro}</p>
+            </Section>
+            <Section title="Verantwortlich">
+              <p>{d.verantwortlich}</p>
+            </Section>
+            <Section title="Server-Logfiles">
+              <p>{d.serverLog}</p>
+            </Section>
+            <Section title="Kontaktformular & E-Mail">
+              <p>{d.kontaktformular}</p>
+            </Section>
+            <Section title="Cookies">
+              <p>{d.cookies}</p>
+            </Section>
+            <Section title="Ihre Rechte">
+              <p>{d.rechte}</p>
+            </Section>
+            <Section title="Datenschutz-Ansprechpartner">
+              <p>{d.kontaktStelle}</p>
+            </Section>
+          </div>
+        </ContentBackground>
       </main>
       <SiteFooter />
       <ScrollToTop />

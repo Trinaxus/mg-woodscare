@@ -4,6 +4,7 @@ import { Leaf, Star } from "lucide-react";
 import heroForest from "@/assets/hero-forest.jpg";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { ContentBackground } from "@/components/BackgroundPattern";
 import { useContent } from "@/lib/content";
 
 export const Route = createFileRoute("/referenzen")({
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/referenzen")({
 function ReferenzenPage() {
   const { content } = useContent();
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-transparent text-foreground">
       <SiteHeader />
 
       <main className="flex-1">
@@ -34,7 +35,7 @@ function ReferenzenPage() {
             alt="Waldlandschaft"
             width={1920}
             height={1280}
-            className="absolute inset-0 -z-10 h-full w-full object-cover"
+            className="absolute inset-0 -z-10 h-full w-full object-cover object-top"
           />
           <div className="absolute inset-0 -z-10 bg-gradient-forest" />
           <div className="mx-auto grid min-h-[50vh] max-w-7xl items-center px-6 py-24">
@@ -52,6 +53,7 @@ function ReferenzenPage() {
           </div>
         </section>
 
+        <ContentBackground>
         {/* REFERENZEN */}
         <section className="border-y border-border bg-card/40">
           <div className="mx-auto max-w-7xl px-6 py-20">
@@ -99,6 +101,7 @@ function ReferenzenPage() {
             </div>
           </div>
         </section>
+        </ContentBackground>
       </main>
 
       <SiteFooter />

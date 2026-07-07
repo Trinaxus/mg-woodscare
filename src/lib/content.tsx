@@ -46,7 +46,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     const loadContent = async () => {
       try {
         const apiContent = await api.getContent<SiteContent>();
-        setContentState(apiContent);
+        setContentState({ ...defaultContent, ...apiContent });
         setApiError(null);
       } catch (error) {
         console.error("Content Load Error:", error);
@@ -127,7 +127,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     setApiError(null);
     try {
       const apiContent = await api.getContent<SiteContent>();
-      setContentState(apiContent);
+      setContentState({ ...defaultContent, ...apiContent });
     } catch (error) {
       console.error("API Load Error:", error);
       setApiError("API nicht erreichbar.");

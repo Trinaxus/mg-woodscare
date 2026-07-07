@@ -11,6 +11,11 @@ export interface SiteContent {
     tagline: string;
     location: string;
   };
+  background: {
+    pattern?: string;
+    opacity?: number;
+    color?: string;
+  };
   hero: {
     eyebrow: string;
     titleLead: string;
@@ -33,7 +38,7 @@ export interface SiteContent {
     badges: string[];
     certLabel: string;
     certSub: string;
-    team: { name: string; role: string; bullets: string[] }[];
+    team: { name: string; role: string; image?: string; bullets: string[] }[];
   };
   features: {
     sawmill: { eyebrow: string; title: string; text: string };
@@ -88,6 +93,11 @@ export const defaultContent: SiteContent = {
     accentName: "Woodscare",
     tagline: "Baumpflegedienst · Leipzig",
     location: "Leipzig & Umland, Sachsen",
+  },
+  background: {
+    pattern: "",
+    opacity: 0.08,
+    color: "",
   },
   hero: {
     eyebrow: "Baumpflegedienst · Sägewerk · Leipzig",

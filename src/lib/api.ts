@@ -81,9 +81,12 @@ export class ApiClient {
   }
 
   // Upload API
-  async uploadImage(file: File): Promise<UploadResponse> {
+  async uploadImage(file: File, folder?: string): Promise<UploadResponse> {
     const formData = new FormData();
     formData.append('image', file);
+    if (folder) {
+      formData.append('folder', folder);
+    }
 
     const url = `${this.baseUrl}/upload.php`;
     

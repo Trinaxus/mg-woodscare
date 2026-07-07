@@ -8,7 +8,14 @@
 
 header('Content-Type: application/json');
 
-$uploadDir = __DIR__ . '/../upload';
+// Erlaubte Unterordner (Whitelist)
+$allowedFolders = ['', 'team', 'bg'];
+$folder = isset($_POST['folder']) ? trim($_POST['folder'], '/') : '';
+if (!in_array($folder, $allowedFolders, true)) {
+    $folder = '';
+}
+
+$uploadDir = __DIR__ . '/../upload' . ($folder ? '/' . $folder : '');
 
 // Upload-Verzeichnis erstellen falls nicht vorhanden
 if (!file_exists($uploadDir)) {
@@ -47,7 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Datei speichern
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
-        $url = '/server/upload/' . $filename;
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'tubox.de';
+        $baseUrl = $protocol . '://' . $host . '/mg_woodscare';
+        $url = $baseUrl . '/server/upload' . ($folder ? '/' . $folder : '') . '/' . $filename;
         echo json_encode([
             'success' => true,
             'message' => 'Bild erfolgreich hochgeladen',

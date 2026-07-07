@@ -4,6 +4,7 @@ import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud } from "luci
 
 import { SiteFooter } from "@/components/SiteChrome";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { api } from "@/lib/api";
 import { useContent, DEFAULT_ADMIN_PASSWORD } from "@/lib/content";
 import { defaultContent, type SiteContent } from "@/data/defaultContent";
 import logo from "@/assets/logo_005.png";
@@ -108,11 +109,28 @@ function AdminDashboard() {
   const [dirty, setDirty] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploadingTeamIndex, setUploadingTeamIndex] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const update = <K extends keyof SiteContent>(key: K, value: SiteContent[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
     setDirty(true);
+  };
+
+  const uploadTeamImage = async (index: number, file: File) => {
+    setUploadingTeamIndex(index);
+    try {
+      const response = await api.uploadImage(file, "team");
+      const team = [...draft.ueberUns.team];
+      team[index] = { ...team[index], image: response.url };
+      update("ueberUns", { ...draft.ueberUns, team });
+      setNotice("Team-Bild hochgeladen.");
+    } catch (error) {
+      setNotice("Fehler beim Hochladen des Bildes.");
+    } finally {
+      setUploadingTeamIndex(null);
+      setTimeout(() => setNotice(null), 2500);
+    }
   };
 
   const save = async () => {
@@ -325,12 +343,49 @@ function AdminDashboard() {
             <ListEditor
               items={draft.ueberUns.team}
               onChange={(items) => update("ueberUns", { ...draft.ueberUns, team: items })}
-              blank={{ name: "", role: "", bullets: [] }}
-              render={(item, set) => (
+              blank={{ name: "", role: "", image: "", bullets: [] }}
+              render={(item, set, index) => (
                 <div className="grid gap-3">
                   <div className="grid gap-3 md:grid-cols-2">
                     <TextField label="Name" value={item.name} onChange={(v) => set({ ...item, name: v })} />
                     <TextField label="Rolle" value={item.role} onChange={(v) => set({ ...item, role: v })} />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-4">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-16 w-16 rounded-full object-cover border border-border"
+                      />
+                    ) : (
+                      <div className="grid h-16 w-16 place-items-center rounded-full bg-primary/10 text-primary font-semibold border border-primary/20">
+                        {item.name ? item.name.split(/\s+/).pop()?.charAt(0).toUpperCase() : "?"}
+                      </div>
+                    )}
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-sm font-medium transition-colors hover:bg-card">
+                      <Upload className="h-4 w-4" />
+                      {uploadingTeamIndex === index ? "Lade..." : "Bild wählen"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        disabled={uploadingTeamIndex === index}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && index !== undefined) uploadTeamImage(index, file);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {item.image && (
+                      <button
+                        type="button"
+                        onClick={() => set({ ...item, image: "" })}
+                        className="text-sm text-destructive hover:underline"
+                      >
+                        Bild entfernen
+                      </button>
+                    )}
                   </div>
                   <TextArea
                     label="Punkte (eine pro Zeile)"
@@ -391,10 +446,9 @@ function AdminDashboard() {
             <TextField label="Profil-URL" value={draft.instagram.url} onChange={(v) => update("instagram", { ...draft.instagram, url: v })} />
             <TextField label="Button-Label" value={draft.instagram.label} onChange={(v) => update("instagram", { ...draft.instagram, label: v })} />
             <p className="mt-4 rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-              Ein Live-Feed von Instagram benötigt die Instagram Graph API mit einem Backend
-              (Access-Token). Aktuell verlinken wir auf das Profil und zeigen den Handle. Sobald
-              deine externe API steht, bindest du dort den Endpoint an und wir tauschen die
-              Verlinkung gegen echte Posts.
+              Ein Live-Feed von Instagram benötigt die Instagram Graph API mit einem Access-Token.
+              Aktuell verlinken wir auf das Profil und zeigen den Handle. Um echte Posts anzuzeigen,
+              ergänze den entsprechenden Endpoint in deiner externen API und binde die Daten hier ein.
             </p>
           </Card>
         )}
@@ -430,20 +484,146 @@ function AdminDashboard() {
           </Card>
         )}
 
-        {tab === "einstellungen" && <SettingsTab />}
+        {tab === "einstellungen" && <SettingsTab draft={draft} update={update} />}
       </main>
       <SiteFooter />
     </div>
   );
 }
 
-function SettingsTab() {
+function SettingsTab({
+  draft,
+  update,
+}: {
+  draft: SiteContent;
+  update: <K extends keyof SiteContent>(key: K, value: SiteContent[K]) => void;
+}) {
   const { adminPassword, setAdminPassword } = useContent();
   const [next, setNext] = useState("");
   const [confirmed, setConfirmed] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
+  const [uploadingBg, setUploadingBg] = useState(false);
+
+  const uploadBackground = async (file: File) => {
+    setUploadingBg(true);
+    try {
+      const response = await api.uploadImage(file, "bg");
+      update("background", { ...draft.background, pattern: response.url });
+      setMsg("Hintergrund-Pattern hochgeladen.");
+    } catch (error) {
+      setMsg("Fehler beim Hochladen des Hintergrunds.");
+    } finally {
+      setUploadingBg(false);
+      setTimeout(() => setMsg(null), 2500);
+    }
+  };
+
   return (
     <Card title="Einstellungen">
+      <p className="text-sm font-medium">Hintergrund-Pattern</p>
+      <p className="text-sm text-muted-foreground">
+        Lade ein nahtlos kachelndes Bild hoch. Es wird im Hintergrund der Seite wiederholt.
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-4">
+        {draft.background?.pattern ? (
+          <div
+            className="h-24 w-24 rounded-2xl border border-border bg-cover bg-center"
+            style={{ backgroundImage: `url(${draft.background.pattern})` }}
+          />
+        ) : (
+          <div className="grid h-24 w-24 place-items-center rounded-2xl border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
+            Kein Bild
+          </div>
+        )}
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-sm font-medium transition-colors hover:bg-card">
+          <Upload className="h-4 w-4" />
+          {uploadingBg ? "Lade..." : "Pattern wählen"}
+          <input
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            disabled={uploadingBg}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) uploadBackground(file);
+              e.target.value = "";
+            }}
+          />
+        </label>
+        {draft.background?.pattern && (
+          <button
+            type="button"
+            onClick={() => update("background", { ...(draft.background || {}), pattern: "" })}
+            className="text-sm text-destructive hover:underline"
+          >
+            Pattern entfernen
+          </button>
+        )}
+      </div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div>
+          <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            Overlay-Farbe
+          </label>
+          <div className="flex flex-wrap items-center gap-3">
+            <input
+              type="color"
+              value={draft.background?.color || "#0f172a"}
+              onChange={(e) => update("background", { ...(draft.background || {}), color: e.target.value })}
+              className="h-10 w-16 cursor-pointer rounded-xl border border-border bg-transparent"
+            />
+            <span className="text-sm font-mono text-muted-foreground">
+              {draft.background?.color || "Standard (Theme)"}
+            </span>
+            {draft.background?.color && (
+              <button
+                type="button"
+                onClick={() => update("background", { ...(draft.background || {}), color: "" })}
+                className="text-sm text-destructive hover:underline"
+              >
+                Standard
+              </button>
+            )}
+          </div>
+        </div>
+        <div>
+          <label className="mb-2 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            Pattern-Deckkraft: {Math.round((draft.background?.opacity ?? 0.08) * 100)}%
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={Math.round((draft.background?.opacity ?? 0.08) * 100)}
+            onChange={(e) =>
+              update("background", {
+                ...(draft.background || {}),
+                opacity: parseInt(e.target.value, 10) / 100,
+              })
+            }
+            className="h-10 w-full accent-primary"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border bg-card/50 p-4">
+        <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Vorschau</p>
+        <div
+          className="mt-3 h-40 w-full rounded-xl border border-border"
+          style={{
+            backgroundImage: draft.background?.pattern ? `url(${draft.background.pattern})` : "none",
+            backgroundRepeat: "repeat",
+            backgroundSize: "auto",
+            backgroundPosition: "top left",
+            opacity: draft.background?.pattern ? (draft.background?.opacity ?? 0.08) : 1,
+            backgroundColor: draft.background?.color || "var(--background)",
+          }}
+        />
+      </div>
+
+      <div className="my-6 h-px bg-border" />
+
       <p className="text-sm text-muted-foreground">
         Aktuelles Passwort: <code className="rounded bg-muted px-1.5 py-0.5">{adminPassword}</code>
       </p>
@@ -469,11 +649,10 @@ function SettingsTab() {
       <div className="mt-10 rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
         <p className="font-medium text-foreground">Hinweis zur Persistenz</p>
         <p className="mt-2">
-          Da du bewusst keine Datenbank nutzt, werden alle Inhalte lokal im Browser gespeichert
-          (localStorage). Exportiere regelmäßig die <code>content.json</code>, um deine Änderungen
-          zu sichern. Sobald deine externe Server-API bereitsteht, wechseln wir die
-          Lade-/Speicher-Aufrufe in <code>src/lib/content.tsx</code> auf HTTP-Aufrufe gegen deinen
-          Endpoint.
+          Alle Inhalte werden über die externe Backend-API auf dem Server gespeichert
+          (<code>content.json</code>). Es gibt keine lokale Speicherung im Browser mehr. Beim
+          Speichern wird automatisch ein Backup der vorherigen Version auf dem Server angelegt.
+          Überprüfe bei Problemen den API-Status und die Berechtigungen auf dem Server.
         </p>
       </div>
     </Card>
@@ -568,7 +747,7 @@ function ListEditor<T>({
 }: {
   items: T[];
   onChange: (items: T[]) => void;
-  render: (item: T, set: (next: T) => void) => React.ReactNode;
+  render: (item: T, set: (next: T) => void, index: number) => React.ReactNode;
   blank: T;
 }) {
   const setAt = (i: number, next: T) => {
@@ -597,7 +776,7 @@ function ListEditor<T>({
               <button onClick={() => remove(i)} className="rounded-full px-2 py-1 text-destructive hover:bg-destructive/10">Löschen</button>
             </div>
           </div>
-          {render(item, (next) => setAt(i, next))}
+          {render(item, (next) => setAt(i, next), i)}
         </div>
       ))}
       <button
