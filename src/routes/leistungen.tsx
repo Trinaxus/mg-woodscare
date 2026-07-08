@@ -17,6 +17,7 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ScrollReveal, HeroReveal } from "@/components/ScrollReveal";
 import { ContentBackground } from "@/components/BackgroundPattern";
+import { ParallaxImage } from "@/components/ParallaxImage";
 import { useContent } from "@/lib/content";
 
 export const Route = createFileRoute("/leistungen")({
@@ -52,12 +53,12 @@ function LeistungenPage() {
       <main className="flex flex-1 flex-col">
         {/* HERO */}
         <section className="relative isolate overflow-hidden pt-24">
-          <img
+          <ParallaxImage
             src={arboristImg}
             alt="Baumpfleger bei der Arbeit"
             width={1920}
             height={1280}
-            className="absolute inset-0 -z-10 h-full w-full object-cover object-top"
+            className="absolute inset-0 -z-10 h-[120%] w-full object-cover object-top"
           />
           <div className="absolute inset-0 -z-10 bg-gradient-forest" />
           <div className="mx-auto grid min-h-[50vh] max-w-7xl items-center px-6 py-24">

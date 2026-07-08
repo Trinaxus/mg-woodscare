@@ -164,9 +164,28 @@ function AppContent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="de">
+    <html lang="de" className="dark">
       <head>
         <HeadContent />
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  var theme = localStorage.getItem("mgw:theme");
+                  if (theme === "light") {
+                    document.documentElement.classList.remove("dark");
+                  } else {
+                    document.documentElement.classList.add("dark");
+                  }
+                } catch (e) {
+                  document.documentElement.classList.add("dark");
+                }
+              })();
+            `,
+          }}
+        />
       </head>
       <body>
         <QueryClientProvider client={queryClient}>

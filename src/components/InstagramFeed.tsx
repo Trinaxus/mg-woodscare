@@ -117,6 +117,16 @@ export function InstagramFeed() {
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedPost, children.length, closeModal]);
 
+  useEffect(() => {
+    if (selectedPost) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [selectedPost]);
+
   if (loading) {
     return (
       <section className="border-y border-border bg-card/40">
@@ -182,11 +192,12 @@ export function InstagramFeed() {
                   <img
                     src={post.media_type === "VIDEO" ? post.thumbnail_url || post.media_url : post.media_url}
                     alt={post.caption?.slice(0, 80) || "Instagram Post"}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
                     loading="lazy"
                   />
 
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 p-4 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-linear-to-t from-black/70 via-black/40 to-black/10 p-4 text-center opacity-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100">
+                    <div className="translate-y-3 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0">
                     <div className="flex gap-6 text-white">
                       <div className="flex items-center gap-1.5">
                         <Heart className="h-5 w-5 fill-current" />
@@ -202,6 +213,7 @@ export function InstagramFeed() {
                     )}
                     <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white backdrop-blur">
                       <ExternalLink className="h-3.5 w-3.5" /> Ansehen
+                    </div>
                     </div>
                   </div>
 
@@ -248,7 +260,7 @@ export function InstagramFeed() {
           </button>
 
           <div
-            className="relative w-full max-w-3xl"
+            className="relative w-full max-w-6xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative flex items-center justify-center">
@@ -257,13 +269,13 @@ export function InstagramFeed() {
                   src={activeMedia.media_url}
                   poster={activeMedia.thumbnail_url}
                   controls
-                  className="max-h-[65vh] w-auto max-w-full rounded-2xl object-contain shadow-2xl"
+                  className="max-h-[75vh] w-auto max-w-full rounded-2xl object-contain shadow-2xl"
                 />
               ) : (
                 <img
                   src={activeMedia.media_url}
                   alt={selectedPost.caption?.slice(0, 80) || "Instagram Post"}
-                  className="max-h-[65vh] w-auto max-w-full rounded-2xl object-contain shadow-2xl"
+                  className="max-h-[75vh] w-auto max-w-full rounded-2xl object-contain shadow-2xl"
                 />
               )}
 
@@ -283,16 +295,6 @@ export function InstagramFeed() {
                   >
                     <ChevronRight className="h-6 w-6" />
                   </button>
-                  <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2 rounded-full bg-black/60 px-3 py-2 backdrop-blur">
-                    {children.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setChildIndex(i)}
-                        className={`h-2.5 w-2.5 rounded-full transition-colors ${i === childIndex ? "bg-white" : "bg-white/40 hover:bg-white/70"}`}
-                        aria-label={`Bild ${i + 1} anzeigen`}
-                      />
-                    ))}
-                  </div>
                   <div className="absolute left-4 top-4 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
                     {childIndex + 1} / {children.length}
                   </div>
@@ -311,10 +313,33 @@ export function InstagramFeed() {
                 </div>
               )}
             </div>
+
+            {selectedPost.media_type === "CAROUSEL_ALBUM" && children.length > 0 && (
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2 px-2">
+                {children.map((child, i) => (
+                  <button
+                    key={child.id}
+                    onClick={() => setChildIndex(i)}
+                    className={`relative h-16 w-16 overflow-hidden rounded-lg border-2 transition-all duration-300 ${
+                      i === childIndex
+                        ? "border-primary ring-2 ring-primary/50"
+                        : "border-transparent opacity-70 hover:opacity-100"
+                    }`}
+                    aria-label={`Bild ${i + 1} anzeigen`}
+                  >
+                    <img
+                      src={child.media_type === "VIDEO" ? child.thumbnail_url || child.media_url : child.media_url}
+                      alt={`Vorschau ${i + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div
-            className="mt-4 w-full max-w-3xl rounded-2xl bg-card/90 p-5 shadow-2xl backdrop-blur"
+            className="mt-4 w-full max-w-6xl rounded-2xl bg-card/90 p-5 shadow-2xl backdrop-blur"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">

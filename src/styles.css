@@ -48,33 +48,33 @@
 :root {
   --radius: 0.75rem;
 
-  --background: oklch(0.94 0.025 75);
-  --foreground: oklch(0.22 0.02 60);
+  --background: oklch(0.88 0.02 80);
+  --foreground: oklch(0.24 0.02 65);
 
-  --card: oklch(0.97 0.02 78);
-  --card-foreground: oklch(0.22 0.02 60);
+  --card: oklch(0.91 0.015 80);
+  --card-foreground: oklch(0.24 0.02 65);
 
-  --popover: oklch(0.97 0.02 78);
-  --popover-foreground: oklch(0.22 0.02 60);
+  --popover: oklch(0.91 0.015 80);
+  --popover-foreground: oklch(0.24 0.02 65);
 
-  --primary: oklch(0.5 0.11 145);
+  --primary: oklch(0.48 0.10 145);
   --primary-foreground: oklch(0.98 0.005 90);
 
-  --secondary: oklch(0.89 0.03 70);
+  --secondary: oklch(0.82 0.025 70);
   --secondary-foreground: oklch(0.28 0.03 60);
 
-  --muted: oklch(0.90 0.025 72);
-  --muted-foreground: oklch(0.45 0.02 65);
+  --muted: oklch(0.82 0.02 75);
+  --muted-foreground: oklch(0.42 0.02 70);
 
-  --accent: oklch(0.6 0.11 55);
+  --accent: oklch(0.55 0.10 55);
   --accent-foreground: oklch(0.98 0.005 90);
 
   --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: oklch(0.98 0.005 90);
 
-  --border: oklch(0.82 0.025 72);
-  --input: oklch(0.88 0.02 75);
-  --ring: oklch(0.5 0.11 145);
+  --border: oklch(0.76 0.02 75);
+  --input: oklch(0.84 0.02 78);
+  --ring: oklch(0.48 0.10 145);
 
   --moss: oklch(0.5 0.11 145);
   --forest: oklch(0.38 0.09 145);
@@ -83,9 +83,9 @@
 
   --gradient-forest: linear-gradient(
     180deg,
-    oklch(0.94 0.025 75 / 0.1) 0%,
-    oklch(0.94 0.025 75 / 0.55) 55%,
-    oklch(0.94 0.025 75 / 0.92) 100%
+    oklch(0.88 0.02 80 / 0.15) 0%,
+    oklch(0.88 0.02 80 / 0.45) 55%,
+    oklch(0.88 0.02 80 / 0.88) 100%
   );
   --gradient-moss: linear-gradient(135deg, var(--moss) 0%, var(--forest) 100%);
   --gradient-amber: linear-gradient(135deg, var(--amber-warm) 0%, var(--bark) 100%);
