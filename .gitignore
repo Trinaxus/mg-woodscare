@@ -38,3 +38,6 @@ dist-ssr
 
 # TanStack Start temporary config files
 app.config.timestamp_*.js
+
+# Instagram PHP proxy config (contains access token)
+server/api/instagram.config.php

@@ -7,14 +7,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { SeoTab } from "@/components/SeoTab";
 import { api } from "@/lib/api";
 import { useContent, DEFAULT_ADMIN_PASSWORD } from "@/lib/content";
-import {
-  fetchInstagramAccountServer,
-  fetchInstagramFeedServer,
-  fetchInstagramMediaChildrenServer,
-  fetchInstagramCommentsServer,
-  fetchInstagramMentionsServer,
-  refreshInstagramTokenServer,
-} from "@/lib/instagram-server";
+import { instagramApi } from "@/lib/instagram-client";
 import { type InstagramAccount, type InstagramMedia } from "@/lib/instagram";
 import { defaultContent, type SiteContent } from "@/data/defaultContent";
 import logo from "@/assets/logo_005.png";
@@ -785,7 +778,7 @@ function InstagramTab({
     setError(null);
     setPosts(null);
     try {
-      const feed = await fetchInstagramFeedServer({ data: { limit: postCount } });
+      const feed = await instagramApi.fetchFeed(postCount);
       setPosts(feed.data ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unbekannter Fehler");
@@ -799,7 +792,7 @@ function InstagramTab({
     setMentionsError(null);
     setMentions(null);
     try {
-      const data = await fetchInstagramMentionsServer();
+      const data = await instagramApi.fetchMentions();
       setMentions(data);
     } catch (err) {
       setMentionsError(err instanceof Error ? err.message : "Unbekannter Fehler");
@@ -813,7 +806,7 @@ function InstagramTab({
     setAccountError(null);
     setAccount(null);
     try {
-      const data = await fetchInstagramAccountServer();
+      const data = await instagramApi.fetchAccount();
       setAccount(data);
     } catch (err) {
       setAccountError(err instanceof Error ? err.message : "Unbekannter Fehler");
@@ -831,7 +824,7 @@ function InstagramTab({
     setChildrenError(null);
     setChildren(null);
     try {
-      const data = await fetchInstagramMediaChildrenServer({ data: { mediaId: mediaId.trim() } });
+      const data = await instagramApi.fetchMediaChildren(mediaId.trim());
       setChildren(data as InstagramMedia[]);
     } catch (err) {
       setChildrenError(err instanceof Error ? err.message : "Unbekannter Fehler");
@@ -849,7 +842,7 @@ function InstagramTab({
     setCommentsError(null);
     setComments(null);
     try {
-      const data = await fetchInstagramCommentsServer({ data: { mediaId: commentsMediaId.trim() } });
+      const data = await instagramApi.fetchComments(commentsMediaId.trim());
       setComments(data);
     } catch (err) {
       setCommentsError(err instanceof Error ? err.message : "Unbekannter Fehler");
@@ -863,7 +856,7 @@ function InstagramTab({
     setRefreshError(null);
     setRefreshResult(null);
     try {
-      const data = await refreshInstagramTokenServer();
+      const data = await instagramApi.refreshToken();
       setRefreshResult(data);
     } catch (err) {
       setRefreshError(err instanceof Error ? err.message : "Unbekannter Fehler");

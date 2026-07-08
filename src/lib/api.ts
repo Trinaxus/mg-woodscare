@@ -28,7 +28,7 @@ export class ApiClient {
     this.baseUrl = baseUrl || import.meta.env.VITE_API_BASE_URL || '/server/api';
   }
 
-  private async request<T>(
+  async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
