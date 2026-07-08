@@ -4,9 +4,18 @@ import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud, Instagram, 
 
 import { SiteFooter } from "@/components/SiteChrome";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SeoTab } from "@/components/SeoTab";
 import { api } from "@/lib/api";
 import { useContent, DEFAULT_ADMIN_PASSWORD } from "@/lib/content";
-import { fetchInstagramFeed, type InstagramMedia } from "@/lib/instagram";
+import {
+  fetchInstagramAccountServer,
+  fetchInstagramFeedServer,
+  fetchInstagramMediaChildrenServer,
+  fetchInstagramCommentsServer,
+  fetchInstagramMentionsServer,
+  refreshInstagramTokenServer,
+} from "@/lib/instagram-server";
+import { type InstagramAccount, type InstagramMedia } from "@/lib/instagram";
 import { defaultContent, type SiteContent } from "@/data/defaultContent";
 import logo from "@/assets/logo_005.png";
 
@@ -32,6 +41,7 @@ const TABS = [
   { id: "instagram", label: "Instagram" },
   { id: "impressum", label: "Impressum" },
   { id: "datenschutz", label: "Datenschutz" },
+  { id: "seo", label: "SEO" },
   { id: "einstellungen", label: "Einstellungen" },
 ] as const;
 
@@ -474,6 +484,7 @@ function AdminDashboard() {
           </Card>
         )}
 
+        {tab === "seo" && <SeoTab />}
         {tab === "einstellungen" && <SettingsTab draft={draft} update={update} />}
       </main>
       <SiteFooter />
@@ -750,6 +761,23 @@ function InstagramTab({
   const [posts, setPosts] = useState<InstagramMedia[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mentions, setMentions] = useState<InstagramMedia[] | null>(null);
+  const [mentionsLoading, setMentionsLoading] = useState(false);
+  const [mentionsError, setMentionsError] = useState<string | null>(null);
+  const [account, setAccount] = useState<InstagramAccount | null>(null);
+  const [accountLoading, setAccountLoading] = useState(false);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  const [children, setChildren] = useState<InstagramMedia[] | null>(null);
+  const [childrenLoading, setChildrenLoading] = useState(false);
+  const [childrenError, setChildrenError] = useState<string | null>(null);
+  const [mediaId, setMediaId] = useState("");
+  const [comments, setComments] = useState<{ id: string; text: string; username?: string; timestamp: string }[] | null>(null);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentsError, setCommentsError] = useState<string | null>(null);
+  const [commentsMediaId, setCommentsMediaId] = useState("");
+  const [refreshResult, setRefreshResult] = useState<{ access_token: string; expires_in: number } | null>(null);
+  const [refreshLoading, setRefreshLoading] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
   const postCount = draft.instagram.postCount || 6;
 
   const testConnection = async () => {
@@ -757,12 +785,90 @@ function InstagramTab({
     setError(null);
     setPosts(null);
     try {
-      const feed = await fetchInstagramFeed(postCount);
+      const feed = await fetchInstagramFeedServer({ data: { limit: postCount } });
       setPosts(feed.data ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unbekannter Fehler");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const testMentions = async () => {
+    setMentionsLoading(true);
+    setMentionsError(null);
+    setMentions(null);
+    try {
+      const data = await fetchInstagramMentionsServer();
+      setMentions(data);
+    } catch (err) {
+      setMentionsError(err instanceof Error ? err.message : "Unbekannter Fehler");
+    } finally {
+      setMentionsLoading(false);
+    }
+  };
+
+  const testAccount = async () => {
+    setAccountLoading(true);
+    setAccountError(null);
+    setAccount(null);
+    try {
+      const data = await fetchInstagramAccountServer();
+      setAccount(data);
+    } catch (err) {
+      setAccountError(err instanceof Error ? err.message : "Unbekannter Fehler");
+    } finally {
+      setAccountLoading(false);
+    }
+  };
+
+  const testChildren = async () => {
+    if (!mediaId.trim()) {
+      setChildrenError("Bitte eine Media-ID eingeben.");
+      return;
+    }
+    setChildrenLoading(true);
+    setChildrenError(null);
+    setChildren(null);
+    try {
+      const data = await fetchInstagramMediaChildrenServer({ data: { mediaId: mediaId.trim() } });
+      setChildren(data as InstagramMedia[]);
+    } catch (err) {
+      setChildrenError(err instanceof Error ? err.message : "Unbekannter Fehler");
+    } finally {
+      setChildrenLoading(false);
+    }
+  };
+
+  const testComments = async () => {
+    if (!commentsMediaId.trim()) {
+      setCommentsError("Bitte eine Media-ID eingeben.");
+      return;
+    }
+    setCommentsLoading(true);
+    setCommentsError(null);
+    setComments(null);
+    try {
+      const data = await fetchInstagramCommentsServer({ data: { mediaId: commentsMediaId.trim() } });
+      setComments(data);
+    } catch (err) {
+      setCommentsError(err instanceof Error ? err.message : "Unbekannter Fehler");
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
+
+  const testRefresh = async () => {
+    setRefreshLoading(true);
+    setRefreshError(null);
+    setRefreshResult(null);
+    try {
+      const data = await refreshInstagramTokenServer();
+      setRefreshResult(data);
+    } catch (err) {
+      setRefreshError(err instanceof Error ? err.message : "Unbekannter Fehler");
+    } finally {
+      setRefreshLoading(false);
     }
   };
 
@@ -842,6 +948,266 @@ function InstagramTab({
         {!posts && !error && !loading && (
           <p className="mt-4 text-sm text-muted-foreground">
             Klicke auf „Verbindung testen“, um zu prüfen, ob der Access Token funktioniert.
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Instagram className="h-5 w-5 text-primary" />
+            <span className="text-sm font-medium">Erwähnungen testen</span>
+          </div>
+          <button
+            onClick={testMentions}
+            disabled={mentionsLoading}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
+          >
+            <Play className="h-4 w-4" />
+            {mentionsLoading ? "Teste..." : "Erwähnungen testen"}
+          </button>
+        </div>
+
+        {mentionsError && (
+          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            {mentionsError}
+          </p>
+        )}
+
+        {mentions && (
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              {mentions.length} Erwähnung(en) gefunden
+            </p>
+            <div className="mt-3 grid grid-cols-3 gap-3">
+              {mentions.slice(0, 6).map((post) => (
+                <a
+                  key={post.id}
+                  href={post.permalink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-background"
+                >
+                  <img
+                    src={post.media_type === "VIDEO" ? post.thumbnail_url || post.media_url : post.media_url}
+                    alt={post.caption?.slice(0, 80) || "Instagram Erwähnung"}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  {post.media_type === "VIDEO" && (
+                    <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-[10px] font-medium text-white">
+                      VIDEO
+                    </span>
+                  )}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!mentions && !mentionsError && !mentionsLoading && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Klicke auf „Erwähnungen testen“, um zu prüfen, ob der Token Erwähnungen deines Accounts abrufen darf.
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Instagram className="h-5 w-5 text-primary" />
+            <span className="text-sm font-medium">Account-Info testen</span>
+          </div>
+          <button
+            onClick={testAccount}
+            disabled={accountLoading}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
+          >
+            <Play className="h-4 w-4" />
+            {accountLoading ? "Teste..." : "Account testen"}
+          </button>
+        </div>
+
+        {accountError && (
+          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            {accountError}
+          </p>
+        )}
+
+        {account && (
+          <div className="mt-4 text-sm">
+            <p className="text-muted-foreground">
+              <span className="font-medium text-foreground">@{account.username}</span> · {account.account_type} · {account.media_count} Beiträge
+            </p>
+            {account.followers_count !== undefined && (
+              <p className="mt-1 text-muted-foreground">{account.followers_count} Follower</p>
+            )}
+            {account.biography && (
+              <p className="mt-2 max-w-xl text-muted-foreground">{account.biography}</p>
+            )}
+          </div>
+        )}
+
+        {!account && !accountError && !accountLoading && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Prüft, ob Profil-Informationen (Username, Account-Typ, Follower, Biografie) abgerufen werden können.
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Instagram className="h-5 w-5 text-primary" />
+            <span className="text-sm font-medium">Carousel / Galerie testen</span>
+          </div>
+          <button
+            onClick={testChildren}
+            disabled={childrenLoading}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
+          >
+            <Play className="h-4 w-4" />
+            {childrenLoading ? "Teste..." : "Galerie testen"}
+          </button>
+        </div>
+        <div className="mt-3">
+          <TextField
+            label="Media-ID eines Carousel-Beitrags"
+            value={mediaId}
+            onChange={setMediaId}
+            placeholder="z. B. 12345678901234567"
+          />
+        </div>
+
+        {childrenError && (
+          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            {childrenError}
+          </p>
+        )}
+
+        {children && (
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              {children.length} Galerie-Element(e) gefunden
+            </p>
+            <div className="mt-3 grid grid-cols-3 gap-3">
+              {children.slice(0, 6).map((item) => (
+                <div
+                  key={item.id}
+                  className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-background"
+                >
+                  <img
+                    src={item.media_type === "VIDEO" ? item.thumbnail_url || item.media_url : item.media_url}
+                    alt="Galerie-Element"
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                  {item.media_type === "VIDEO" && (
+                    <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-[10px] font-medium text-white">
+                      VIDEO
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!children && !childrenError && !childrenLoading && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Gib die Media-ID eines Carousel-Albums ein, um zu testen, ob die Einzelbilder geladen werden.
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Instagram className="h-5 w-5 text-primary" />
+            <span className="text-sm font-medium">Kommentare testen</span>
+          </div>
+          <button
+            onClick={testComments}
+            disabled={commentsLoading}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
+          >
+            <Play className="h-4 w-4" />
+            {commentsLoading ? "Teste..." : "Kommentare testen"}
+          </button>
+        </div>
+        <div className="mt-3">
+          <TextField
+            label="Media-ID eines Beitrags"
+            value={commentsMediaId}
+            onChange={setCommentsMediaId}
+            placeholder="z. B. 12345678901234567"
+          />
+        </div>
+
+        {commentsError && (
+          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            {commentsError}
+          </p>
+        )}
+
+        {comments && (
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              {comments.length} Kommentar(e) gefunden
+            </p>
+            <div className="mt-3 max-h-60 overflow-y-auto rounded-2xl border border-border bg-background">
+              {comments.slice(0, 10).map((comment) => (
+                <div key={comment.id} className="border-b border-border p-3 text-sm last:border-0">
+                  <p className="font-medium text-foreground">{comment.username || "Unbekannt"}</p>
+                  <p className="text-muted-foreground">{comment.text}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{new Date(comment.timestamp).toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!comments && !commentsError && !commentsLoading && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Gib die Media-ID eines Beitrags ein, um zu testen, ob Kommentare abgerufen werden können.
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Instagram className="h-5 w-5 text-primary" />
+            <span className="text-sm font-medium">Token-Refresh testen</span>
+          </div>
+          <button
+            onClick={testRefresh}
+            disabled={refreshLoading}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
+          >
+            <Play className="h-4 w-4" />
+            {refreshLoading ? "Teste..." : "Refresh testen"}
+          </button>
+        </div>
+
+        {refreshError && (
+          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            {refreshError}
+          </p>
+        )}
+
+        {refreshResult && (
+          <div className="mt-4 text-sm">
+            <p className="text-muted-foreground">
+              Token gültig für <span className="font-medium text-foreground">{Math.round(refreshResult.expires_in / 86400)} Tage</span>
+            </p>
+            <p className="mt-1 break-all text-xs text-muted-foreground">{refreshResult.access_token.slice(0, 20)}…</p>
+          </div>
+        )}
+
+        {!refreshResult && !refreshError && !refreshLoading && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Prüft, ob der Access Token verlängert werden kann.
           </p>
         )}
       </div>

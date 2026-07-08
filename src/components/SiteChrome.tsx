@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Instagram, Phone, X, Menu } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { ApiStatus } from "./ApiStatus";
+import { SsrStatus } from "./SsrStatus";
 import { useContent } from "@/lib/content";
 import logo from "@/assets/logo_005.png";
 
@@ -31,7 +32,7 @@ export function SiteHeader() {
   return (
     <header className="fixed top-0 z-50 w-full border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div
-        className="absolute inset-x-0 bottom-0"
+        className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
         style={{
           height: `${hairlineThickness}px`,
           backgroundImage: `linear-gradient(to right, transparent, ${hairlineColor}, transparent)`,
@@ -232,6 +233,7 @@ export function SiteFooter() {
             Admin
           </Link>
           <ApiStatus />
+          <SsrStatus />
         </div>
       </div>
     </footer>

@@ -1,6 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { Heart, MessageCircle, Instagram, ExternalLink, X, ChevronLeft, ChevronRight, Play } from "lucide-react";
-import { fetchInstagramAccount, fetchInstagramFeed, fetchInstagramMediaChildren, fetchInstagramComments, type InstagramAccount, type InstagramMedia, type InstagramMediaChild, type InstagramComment } from "@/lib/instagram";
+import {
+  fetchInstagramAccountServer,
+  fetchInstagramFeedServer,
+  fetchInstagramMediaChildrenServer,
+  fetchInstagramCommentsServer,
+} from "@/lib/instagram-server";
+import { type InstagramAccount, type InstagramMedia, type InstagramMediaChild, type InstagramComment } from "@/lib/instagram";
 import { useContent } from "@/lib/content";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
@@ -27,8 +33,8 @@ export function InstagramFeed() {
     async function load() {
       try {
         const [accountData, feed] = await Promise.all([
-          fetchInstagramAccount(),
-          fetchInstagramFeed(postCount),
+          fetchInstagramAccountServer(),
+          fetchInstagramFeedServer({ data: { limit: postCount } }),
         ]);
         if (!mounted) return;
         setAccount(accountData);
@@ -57,7 +63,7 @@ export function InstagramFeed() {
     // Kommentare laden
     setCommentsLoading(true);
     try {
-      const commentData = await fetchInstagramComments(post.id);
+      const commentData = await fetchInstagramCommentsServer({ data: { mediaId: post.id } });
       setComments(commentData);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Fehler beim Laden der Kommentare.";
@@ -70,7 +76,7 @@ export function InstagramFeed() {
     if (post.media_type === "CAROUSEL_ALBUM") {
       setChildrenLoading(true);
       try {
-        const data = await fetchInstagramMediaChildren(post.id);
+        const data = await fetchInstagramMediaChildrenServer({ data: { mediaId: post.id } });
         setChildren(data);
         if (data.length === 0) {
           setChildrenError("Keine Galerie-Bilder von der API erhalten.");

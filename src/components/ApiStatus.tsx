@@ -25,7 +25,7 @@ export function ApiStatus() {
   }, []);
 
   const statusColor = {
-    online: "bg-green-500",
+    online: "bg-primary",
     offline: "bg-red-500",
     checking: "bg-yellow-500",
   }[status];
@@ -37,15 +37,13 @@ export function ApiStatus() {
   }[status];
 
   return (
-    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <div className="flex items-center gap-1.5">
-        <div
-          className={`h-2 w-2 rounded-full ${statusColor} ${
-            status === "online" ? "animate-pulse" : ""
-          }`}
-        />
-        <span>{statusText}</span>
-      </div>
+    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <span className="relative flex h-2.5 w-2.5">
+        <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${statusColor} opacity-75`} />
+        <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${statusColor}`} />
+      </span>
+      <span className="hidden sm:inline">{statusText}</span>
+      <span className="sm:hidden">{status === "online" ? "API" : status === "offline" ? "API" : "..."}</span>
       {lastCheck && (
         <span className="opacity-60">
           ({lastCheck.toLocaleTimeString()})

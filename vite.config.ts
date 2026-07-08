@@ -1,20 +1,10 @@
 import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
-import tanstackRouter from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
-import path from "path";
+import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tanstackRouter(),
-    tailwindcss(),
-  ],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
   server: {
     port: 8080,
     proxy: {
@@ -26,7 +16,22 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    outDir: "dist",
+  resolve: {
+    tsconfigPaths: true,
   },
+  plugins: [
+    tanstackStart({
+      prerender: {
+        enabled: true,
+        autoSubfolderIndex: true,
+        autoStaticPathsDiscovery: true,
+        concurrency: 4,
+        crawlLinks: true,
+        failOnError: true,
+      },
+    }),
+    react(),
+    tailwindcss(),
+    tsConfigPaths(),
+  ],
 });
