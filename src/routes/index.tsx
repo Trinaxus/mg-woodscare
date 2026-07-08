@@ -22,6 +22,7 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ScrollReveal, HeroReveal } from "@/components/ScrollReveal";
 import { TeamAvatar } from "@/components/TeamAvatar";
+import { InstagramFeed } from "@/components/InstagramFeed";
 import { ContentBackground } from "@/components/BackgroundPattern";
 import { useContent } from "@/lib/content";
 
@@ -244,6 +245,9 @@ function LandingPage() {
           </ScrollReveal>
         </div>
       </section>
+
+      {/* INSTAGRAM FEED */}
+      <InstagramFeed />
       </ContentBackground>
       </main>
 

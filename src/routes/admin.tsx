@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud } from "lucide-react";
+import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud, Instagram, Play } from "lucide-react";
 
 import { SiteFooter } from "@/components/SiteChrome";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { api } from "@/lib/api";
 import { useContent, DEFAULT_ADMIN_PASSWORD } from "@/lib/content";
+import { fetchInstagramFeed, type InstagramMedia } from "@/lib/instagram";
 import { defaultContent, type SiteContent } from "@/data/defaultContent";
 import logo from "@/assets/logo_005.png";
 
@@ -440,18 +441,7 @@ function AdminDashboard() {
           </Card>
         )}
 
-        {tab === "instagram" && (
-          <Card title="Instagram">
-            <TextField label="Handle (mit @)" value={draft.instagram.handle} onChange={(v) => update("instagram", { ...draft.instagram, handle: v })} />
-            <TextField label="Profil-URL" value={draft.instagram.url} onChange={(v) => update("instagram", { ...draft.instagram, url: v })} />
-            <TextField label="Button-Label" value={draft.instagram.label} onChange={(v) => update("instagram", { ...draft.instagram, label: v })} />
-            <p className="mt-4 rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-              Ein Live-Feed von Instagram benötigt die Instagram Graph API mit einem Access-Token.
-              Aktuell verlinken wir auf das Profil und zeigen den Handle. Um echte Posts anzuzeigen,
-              ergänze den entsprechenden Endpoint in deiner externen API und binde die Daten hier ein.
-            </p>
-          </Card>
-        )}
+        {tab === "instagram" && <InstagramTab draft={draft} update={update} />}
 
         {tab === "impressum" && (
           <Card title="Impressum">
@@ -745,6 +735,117 @@ function ToolbarBtn({
     >
       <Icon className="h-3.5 w-3.5" /> {label}
     </button>
+  );
+}
+
+const POST_COUNT_OPTIONS = [6, 8, 10, 20, 50];
+
+function InstagramTab({
+  draft,
+  update,
+}: {
+  draft: SiteContent;
+  update: <K extends keyof SiteContent>(key: K, value: SiteContent[K]) => void;
+}) {
+  const [posts, setPosts] = useState<InstagramMedia[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const postCount = draft.instagram.postCount || 6;
+
+  const testConnection = async () => {
+    setLoading(true);
+    setError(null);
+    setPosts(null);
+    try {
+      const feed = await fetchInstagramFeed(postCount);
+      setPosts(feed.data ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unbekannter Fehler");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card title="Instagram">
+      <TextField label="Handle (mit @)" value={draft.instagram.handle} onChange={(v) => update("instagram", { ...draft.instagram, handle: v })} />
+      <TextField label="Profil-URL" value={draft.instagram.url} onChange={(v) => update("instagram", { ...draft.instagram, url: v })} />
+      <TextField label="Button-Label" value={draft.instagram.label} onChange={(v) => update("instagram", { ...draft.instagram, label: v })} />
+      <label className="block">
+        <span className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          Anzahl Beiträge auf der Startseite
+        </span>
+        <select
+          value={postCount}
+          onChange={(e) => update("instagram", { ...draft.instagram, postCount: Number(e.target.value) })}
+          className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+        >
+          {POST_COUNT_OPTIONS.map((n) => (
+            <option key={n} value={n}>{n} Beiträge</option>
+          ))}
+        </select>
+      </label>
+
+      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Instagram className="h-5 w-5 text-primary" />
+            <span className="text-sm font-medium">API-Verbindung testen</span>
+          </div>
+          <button
+            onClick={testConnection}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
+          >
+            <Play className="h-4 w-4" />
+            {loading ? "Teste..." : "Verbindung testen"}
+          </button>
+        </div>
+
+        {error && (
+          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            {error}
+          </p>
+        )}
+
+        {posts && (
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              {posts.length} Posts gefunden
+            </p>
+            <div className="mt-3 grid grid-cols-3 gap-3">
+              {posts.slice(0, 6).map((post) => (
+                <a
+                  key={post.id}
+                  href={post.permalink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-background"
+                >
+                  <img
+                    src={post.media_type === "VIDEO" ? post.thumbnail_url || post.media_url : post.media_url}
+                    alt={post.caption?.slice(0, 80) || "Instagram Post"}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  {post.media_type === "VIDEO" && (
+                    <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-[10px] font-medium text-white">
+                      VIDEO
+                    </span>
+                  )}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!posts && !error && !loading && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Klicke auf „Verbindung testen“, um zu prüfen, ob der Access Token funktioniert.
+          </p>
+        )}
+      </div>
+    </Card>
   );
 }
 
