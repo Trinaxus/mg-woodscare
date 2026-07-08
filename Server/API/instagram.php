@@ -25,10 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 function decryptToken(string $ciphertext, string $key): string|false {
-    $parts = explode('::', base64_decode($ciphertext), 2);
+    $decoded = base64_decode($ciphertext, true);
+    if ($decoded === false) return false;
+
+    $parts = explode('::', $decoded, 2);
     if (count($parts) !== 2) return false;
 
-    [$iv, $encrypted] = $parts;
+    $iv = base64_decode($parts[0], true);
+    $encrypted = base64_decode($parts[1], true);
+    if ($iv === false || $encrypted === false) return false;
+
     $plain = openssl_decrypt($encrypted, 'AES-256-CBC', hash('sha256', $key, true), OPENSSL_RAW_DATA, $iv);
     return $plain !== false ? $plain : false;
 }
