@@ -18,24 +18,6 @@ function extractShortcode(input: string): string | null {
   return /^[A-Za-z0-9_-]+$/.test(input) ? input : null;
 }
 
-function shortcodeToMediaId(shortcode: string): string | null {
-  try {
-    const base64 = shortcode
-      .replace(/-/g, "+")
-      .replace(/_/g, "/")
-      .padEnd(shortcode.length + ((4 - (shortcode.length % 4)) % 4), "=");
-    const binary = atob(base64);
-    // Instagram-Shortcodes kodieren eine 64-Bit-ID (8 Bytes, big-endian)
-    const bytes = binary.slice(0, 8);
-    const hex = Array.from(bytes)
-      .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
-      .join("");
-    return BigInt("0x" + hex).toString();
-  } catch {
-    return null;
-  }
-}
-
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
@@ -1104,10 +1086,14 @@ function InstagramTab({
             onChange={(v) => {
               setMediaPermalink(v);
               const shortcode = extractShortcode(v);
-              if (shortcode) {
-                const id = shortcodeToMediaId(shortcode);
-                if (id) setMediaId(id);
-              }
+              if (!shortcode) return;
+              // ID über den Feed ermitteln, da Shortcode nicht direkt berechenbar ist
+              instagramApi.fetchFeed(50).then((res) => {
+                const found = res.data.find((post) =>
+                  post.permalink.includes(shortcode) || post.id === shortcode
+                );
+                if (found) setMediaId(found.id);
+              });
             }}
             placeholder="https://www.instagram.com/p/DOONfwbiPDH/"
           />
