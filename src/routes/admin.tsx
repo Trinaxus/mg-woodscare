@@ -185,11 +185,11 @@ function AdminDashboard() {
   };
 
   const reset = () => {
-    if (!confirm("Alle Inhalte auf Standardwerte zurücksetzen?")) return;
+    if (!confirm("ACHTUNG: Alle Inhalte werden komplett geleert und auf den leeren Standard zurückgesetzt.\n\nVorher unbedingt ein Backup (Export) erstellen!\n\nTrotzdem fortfahren?")) return;
     resetContent();
     setDraft(defaultContent);
     setDirty(false);
-    setNotice("Auf Standard zurückgesetzt.");
+    setNotice("Alle Inhalte wurden zurückgesetzt.");
     setTimeout(() => setNotice(null), 2500);
   };
 
