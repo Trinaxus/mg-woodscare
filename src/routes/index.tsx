@@ -26,14 +26,15 @@ import { InstagramFeed } from "@/components/InstagramFeed";
 import { ContentBackground } from "@/components/BackgroundPattern";
 import { ParallaxImage } from "@/components/ParallaxImage";
 import { useContent } from "@/lib/content";
+import { defaultContent } from "@/data/defaultContent";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MG Woodscare – Baumpflege & Sägewerk Leipzig" },
+      { title: "MG Woodscare - Baumpflege & Sägewerk Leipzig" },
       {
         name: "description",
-        content: "Professionelle Baumpflege, Baumfällung, Seilklettertechnik SKT und Sägewerk in Leipzig. 20+ Jahre Erfahrung. Notdienst 24/7 für Leipzig & Umland.",
+        content: defaultContent.seo?.homeDescription || "",
       },
     ],
   }),
@@ -53,6 +54,12 @@ const iconMap: Record<string, LucideIcon> = {
 
 function LandingPage() {
   const { content } = useContent();
+  const showCta =
+    content.home.ctaTitle.trim() ||
+    content.home.ctaSubtitle.trim() ||
+    content.home.ctaPrimaryLabel.trim() ||
+    content.home.ctaSecondaryLabel.trim() ||
+    content.home.ctaTertiaryLabel.trim();
   return (
     <div className="flex min-h-screen flex-col bg-transparent text-foreground">
       <SiteHeader />
@@ -75,19 +82,17 @@ function LandingPage() {
                 <Leaf className="h-3.5 w-3.5" /> {content.hero.eyebrow}
               </span>
             </HeroReveal>
+            <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.05] text-balance md:text-7xl">
+              {content.hero.titleLead}{" "}
+              <span className="italic text-primary">{content.hero.titleAccent}</span>{" "}
+              {content.hero.titleTail}
+            </h1>
             <HeroReveal delay={150}>
-              <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.05] text-balance md:text-7xl">
-                {content.hero.titleLead}{" "}
-                <span className="italic text-primary">{content.hero.titleAccent}</span>{" "}
-                {content.hero.titleTail}
-              </h1>
-            </HeroReveal>
-            <HeroReveal delay={300}>
               <p className="mt-6 max-w-xl text-lg text-foreground/85 md:text-xl">
                 {content.hero.subtitle}
               </p>
             </HeroReveal>
-            <HeroReveal delay={450}>
+            <HeroReveal delay={300}>
               <div className="mt-10 flex flex-wrap gap-4">
                 <a
                   href="/leistungen"
@@ -148,7 +153,7 @@ function LandingPage() {
           <ScrollReveal direction="right" delay={150}>
             <div>
               <span className="text-xs font-medium uppercase tracking-widest text-primary">
-                Über uns
+                {content.home.ueberUnsEyebrow}
               </span>
               <h2 className="mt-3 font-display text-4xl font-semibold md:text-5xl">
                 {content.ueberUns.title}
@@ -169,7 +174,7 @@ function LandingPage() {
         {/* TEAM */}
         <div className="mx-auto max-w-7xl px-6 pb-24">
           <ScrollReveal>
-            <h3 className="font-display text-2xl font-semibold">Unser Team</h3>
+            <h3 className="font-display text-2xl font-semibold">{content.home.teamTitle}</h3>
           </ScrollReveal>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {content.ueberUns.team.map((m, i) => (
@@ -209,43 +214,54 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* CTA SECTION */}
+      {showCta && (
       <section className="border-y border-border bg-muted/30">
         <div className="mx-auto max-w-7xl px-6 py-20 text-center">
-          <ScrollReveal>
-            <h2 className="font-display text-3xl font-semibold md:text-4xl">
-              Professionelle Baumpflege in Leipzig
-            </h2>
-          </ScrollReveal>
-          <ScrollReveal delay={100}>
-            <p className="mt-4 text-lg text-foreground/75">
-              20+ Jahre Erfahrung, Notdienst 24/7, nachhaltige Holzverarbeitung
-            </p>
-          </ScrollReveal>
+          {content.home.ctaTitle.trim() && (
+            <ScrollReveal>
+              <h2 className="font-display text-3xl font-semibold md:text-4xl">
+                {content.home.ctaTitle}
+              </h2>
+            </ScrollReveal>
+          )}
+          {content.home.ctaSubtitle.trim() && (
+            <ScrollReveal delay={100}>
+              <p className="mt-4 text-lg text-foreground/75">
+                {content.home.ctaSubtitle}
+              </p>
+            </ScrollReveal>
+          )}
           <ScrollReveal delay={200}>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <a
-                href="/leistungen"
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-medium text-primary-foreground shadow-glow transition-transform hover:scale-[1.03]"
-              >
-                Unsere Leistungen
-              </a>
-              <a
-                href="/referenzen"
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-6 py-3 font-medium backdrop-blur transition-colors hover:bg-card"
-              >
-                Unsere Referenzen
-              </a>
-              <a
-                href="/kontakt"
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-6 py-3 font-medium backdrop-blur transition-colors hover:bg-card"
-              >
-                Kontakt aufnehmen
-              </a>
+              {content.home.ctaPrimaryLabel.trim() && (
+                <a
+                  href="/leistungen"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-medium text-primary-foreground shadow-glow transition-transform hover:scale-[1.03]"
+                >
+                  {content.home.ctaPrimaryLabel}
+                </a>
+              )}
+              {content.home.ctaSecondaryLabel.trim() && (
+                <a
+                  href="/referenzen"
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-6 py-3 font-medium backdrop-blur transition-colors hover:bg-card"
+                >
+                  {content.home.ctaSecondaryLabel}
+                </a>
+              )}
+              {content.home.ctaTertiaryLabel.trim() && (
+                <a
+                  href="/kontakt"
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-6 py-3 font-medium backdrop-blur transition-colors hover:bg-card"
+                >
+                  {content.home.ctaTertiaryLabel}
+                </a>
+              )}
             </div>
           </ScrollReveal>
         </div>
       </section>
+      )}
 
       {/* INSTAGRAM FEED */}
       <InstagramFeed />

@@ -94,7 +94,17 @@ export interface SiteContent {
     rechte: string;
     kontaktStelle: string;
   };
+  home: {
+    ueberUnsEyebrow: string;
+    teamTitle: string;
+    ctaTitle: string;
+    ctaSubtitle: string;
+    ctaPrimaryLabel: string;
+    ctaSecondaryLabel: string;
+    ctaTertiaryLabel: string;
+  };
   seo?: {
+    homeDescription?: string;
     leistungenDescription?: string;
     leistungenKeywords?: string;
   };
@@ -190,7 +200,17 @@ export const defaultContent: SiteContent = {
     rechte: "",
     kontaktStelle: "",
   },
+  home: {
+    ueberUnsEyebrow: "",
+    teamTitle: "",
+    ctaTitle: "",
+    ctaSubtitle: "",
+    ctaPrimaryLabel: "",
+    ctaSecondaryLabel: "",
+    ctaTertiaryLabel: "",
+  },
   seo: {
+    homeDescription: "",
     leistungenDescription: "",
     leistungenKeywords: "",
   },

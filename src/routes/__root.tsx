@@ -64,7 +64,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MG Woodscare – Baumpflege & Sägewerk Leipzig" },
+      { title: "MG Woodscare - Baumpflege & Sägewerk Leipzig" },
       {
         name: "description",
         content:
@@ -77,7 +77,7 @@ export const Route = createRootRoute({
       { name: "author", content: "MG Woodscare" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#0f172a" },
-      { property: "og:title", content: "MG Woodscare – Baumpflege & Sägewerk Leipzig" },
+      { property: "og:title", content: "MG Woodscare - Baumpflege & Sägewerk Leipzig" },
       {
         property: "og:description",
         content:
@@ -88,7 +88,7 @@ export const Route = createRootRoute({
       { property: "og:image", content: "/assets/logo_005.png" },
       { property: "og:locale", content: "de_DE" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "MG Woodscare – Baumpflege & Sägewerk Leipzig" },
+      { name: "twitter:title", content: "MG Woodscare - Baumpflege & Sägewerk Leipzig" },
       {
         name: "twitter:description",
         content:

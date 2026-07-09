@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Search, Globe, FileText, CheckCircle, AlertCircle, XCircle, Zap } from "lucide-react";
 import { routeTree } from "@/routeTree.gen";
+import type { SiteContent } from "@/data/defaultContent";
 
 interface RouteInfo {
   path: string;
@@ -75,7 +76,13 @@ function analyzeSeo(): { checks: SeoCheck[]; score: number; meta: Record<string,
   };
 }
 
-export function SeoTab() {
+export function SeoTab({
+  draft,
+  update,
+}: {
+  draft: SiteContent;
+  update: <K extends keyof SiteContent>(key: K, value: SiteContent[K]) => void;
+}) {
   const [routes, setRoutes] = useState<RouteInfo[]>([]);
   const [seo, setSeo] = useState<{ checks: SeoCheck[]; score: number; meta: Record<string, string> } | null>(null);
 
@@ -83,6 +90,11 @@ export function SeoTab() {
     setRoutes(collectRoutes());
     setSeo(analyzeSeo());
   }, []);
+
+  const seoValue = draft.seo || {};
+  const setSeoField = (field: keyof NonNullable<SiteContent["seo"]>, value: string) => {
+    update("seo", { ...seoValue, [field]: value } as SiteContent["seo"]);
+  };
 
   const scoreColor = seo && seo.score >= 90 ? "text-green-500" : seo && seo.score >= 70 ? "text-yellow-500" : "text-red-500";
   const scoreBg = seo && seo.score >= 90 ? "bg-green-500" : seo && seo.score >= 70 ? "bg-yellow-500" : "bg-red-500";
@@ -96,6 +108,39 @@ export function SeoTab() {
       <p className="mt-2 text-sm text-muted-foreground">
         Übersicht über statisch gerenderte Seiten und die aktuell erkannten Meta-Informationen.
       </p>
+
+      <div className="mt-6 rounded-2xl border border-border bg-muted/40 p-5">
+        <h3 className="font-medium">Meta-Descriptions bearbeiten</h3>
+        <div className="mt-4 grid gap-4">
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Startseite</span>
+            <textarea
+              value={seoValue.homeDescription || ""}
+              onChange={(e) => setSeoField("homeDescription", e.target.value)}
+              rows={3}
+              className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Leistungen</span>
+            <textarea
+              value={seoValue.leistungenDescription || ""}
+              onChange={(e) => setSeoField("leistungenDescription", e.target.value)}
+              rows={3}
+              className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Leistungen Keywords</span>
+            <input
+              type="text"
+              value={seoValue.leistungenKeywords || ""}
+              onChange={(e) => setSeoField("leistungenKeywords", e.target.value)}
+              className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none transition-colors focus:border-primary"
+            />
+          </label>
+        </div>
+      </div>
 
       {seo && (
         <div className="mt-6 grid gap-6 md:grid-cols-2">

@@ -30,7 +30,7 @@ export const Route = createFileRoute("/admin")({
 
 const TABS = [
   { id: "brand", label: "Marke" },
-  { id: "hero", label: "Hero" },
+  { id: "hero", label: "Startseite" },
   { id: "stats", label: "Zahlen" },
   { id: "leistungen", label: "Leistungen" },
   { id: "ueberUns", label: "Über uns / Team" },
@@ -258,7 +258,7 @@ function AdminDashboard() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 sm:px-6 py-3">
           <TabButton id="brand" label="Marke" tab={tab} setTab={setTab} />
           <TabDropdown label="Inhalt" active={tab} options={[
-            { id: "hero", label: "Hero" },
+            { id: "hero", label: "Startseite" },
             { id: "stats", label: "Zahlen" },
             { id: "leistungen", label: "Leistungen" },
             { id: "ueberUns", label: "Über uns / Team" },
@@ -287,7 +287,8 @@ function AdminDashboard() {
         )}
 
         {tab === "hero" && (
-          <Card title="Hero-Bereich">
+          <Card title="Startseite">
+            <p className="text-sm font-medium">Hero-Bereich</p>
             <TextField label="Eyebrow / kleine Zeile" value={draft.hero.eyebrow} onChange={(v) => update("hero", { ...draft.hero, eyebrow: v })} />
             <TextField label="Titel – Anfang" value={draft.hero.titleLead} onChange={(v) => update("hero", { ...draft.hero, titleLead: v })} />
             <TextField label="Titel – Akzentwort" value={draft.hero.titleAccent} onChange={(v) => update("hero", { ...draft.hero, titleAccent: v })} />
@@ -295,6 +296,17 @@ function AdminDashboard() {
             <TextArea label="Untertitel" value={draft.hero.subtitle} onChange={(v) => update("hero", { ...draft.hero, subtitle: v })} />
             <TextField label="Button primär" value={draft.hero.ctaPrimary} onChange={(v) => update("hero", { ...draft.hero, ctaPrimary: v })} />
             <TextField label="Button sekundär" value={draft.hero.ctaSecondary} onChange={(v) => update("hero", { ...draft.hero, ctaSecondary: v })} />
+            <div className="mt-6 h-px bg-border" />
+            <p className="text-sm font-medium">Über uns / Team</p>
+            <TextField label="Über-uns Eyebrow" value={draft.home.ueberUnsEyebrow} onChange={(v) => update("home", { ...draft.home, ueberUnsEyebrow: v })} />
+            <TextField label="Team-Titel" value={draft.home.teamTitle} onChange={(v) => update("home", { ...draft.home, teamTitle: v })} />
+            <div className="mt-6 h-px bg-border" />
+            <p className="text-sm font-medium">Call-to-Action Bereich</p>
+            <TextField label="CTA Titel" value={draft.home.ctaTitle} onChange={(v) => update("home", { ...draft.home, ctaTitle: v })} />
+            <TextField label="CTA Untertitel" value={draft.home.ctaSubtitle} onChange={(v) => update("home", { ...draft.home, ctaSubtitle: v })} />
+            <TextField label="CTA Button 1" value={draft.home.ctaPrimaryLabel} onChange={(v) => update("home", { ...draft.home, ctaPrimaryLabel: v })} />
+            <TextField label="CTA Button 2" value={draft.home.ctaSecondaryLabel} onChange={(v) => update("home", { ...draft.home, ctaSecondaryLabel: v })} />
+            <TextField label="CTA Button 3" value={draft.home.ctaTertiaryLabel} onChange={(v) => update("home", { ...draft.home, ctaTertiaryLabel: v })} />
           </Card>
         )}
 
@@ -522,7 +534,7 @@ function AdminDashboard() {
           </Card>
         )}
 
-        {tab === "seo" && <SeoTab />}
+        {tab === "seo" && <SeoTab draft={draft} update={update} />}
         {tab === "einstellungen" && <SettingsTab draft={draft} update={update} />}
       </main>
       <SiteFooter />
