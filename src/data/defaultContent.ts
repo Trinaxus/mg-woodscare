@@ -185,8 +185,8 @@ export const defaultContent: SiteContent = {
     selectedPostIds: [],
   },
   social: {
-    facebook: "",
-    instagram: "",
+    facebook: "https://www.facebook.com/share/17rZc8gQf9/?mibextid=wwXIfr",
+    instagram: "https://www.instagram.com/mg_woodscare_baumpflegedienst_",
     whatsapp: "",
     youtube: "",
     tiktok: "",
