@@ -40,6 +40,7 @@ import { ScrollReveal, HeroReveal } from "@/components/ScrollReveal";
 import { ContentBackground } from "@/components/BackgroundPattern";
 import { ParallaxImage } from "@/components/ParallaxImage";
 import { useContent } from "@/lib/content";
+import { defaultContent } from "@/data/defaultContent";
 
 export const Route = createFileRoute("/leistungen")({
   head: () => ({
@@ -47,9 +48,9 @@ export const Route = createFileRoute("/leistungen")({
       { title: "Leistungen – MG Woodscare Baumpflege & Sägewerk Leipzig" },
       {
         name: "description",
-        content: "Professionelle Baumpflege, Baumfällung, Seilklettertechnik SKT, Wurzelfräsung und Sägewerk in Leipzig. 20+ Jahre Erfahrung für Leipzig & Umland.",
+        content: defaultContent.seo?.leistungenDescription || "",
       },
-      { name: "keywords", content: "Baumpflege Leipzig, Baumfällung, Seilklettertechnik SKT, Wurzelfräsung, Sägewerk, Holzverarbeitung" },
+      { name: "keywords", content: defaultContent.seo?.leistungenKeywords || "" },
     ],
   }),
   component: LeistungenPage,
