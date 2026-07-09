@@ -798,6 +798,9 @@ function InstagramTab({
     message: string;
   } | null>(null);
   const [tokenStatusLoading, setTokenStatusLoading] = useState(false);
+  const [cronResult, setCronResult] = useState<{ success: boolean; message: string; expires_in_days: number; expires_at: string; timestamp: string } | null>(null);
+  const [cronLoading, setCronLoading] = useState(false);
+  const [cronError, setCronError] = useState<string | null>(null);
   const postCount = draft.instagram.postCount ?? 6;
 
   const loadTokenStatus = async () => {
@@ -906,6 +909,21 @@ function InstagramTab({
       setRefreshError(err instanceof Error ? err.message : "Unbekannter Fehler");
     } finally {
       setRefreshLoading(false);
+    }
+  };
+
+  const testCron = async () => {
+    setCronLoading(true);
+    setCronError(null);
+    setCronResult(null);
+    try {
+      const data = await instagramApi.runCronRefresh();
+      setCronResult(data);
+      await loadTokenStatus();
+    } catch (err) {
+      setCronError(err instanceof Error ? err.message : "Unbekannter Fehler");
+    } finally {
+      setCronLoading(false);
     }
   };
 
@@ -1245,7 +1263,7 @@ function InstagramTab({
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={loadTokenStatus}
               disabled={tokenStatusLoading}
@@ -1260,6 +1278,14 @@ function InstagramTab({
             >
               <Play className="h-4 w-4" />
               {refreshLoading ? "Erneuern..." : "Manuell erneuern"}
+            </button>
+            <button
+              onClick={testCron}
+              disabled={cronLoading}
+              className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-transform hover:scale-[1.03] disabled:opacity-50"
+            >
+              <RotateCcw className="h-4 w-4" />
+              {cronLoading ? "Simuliere..." : "Cron simulieren"}
             </button>
           </div>
         </div>
@@ -1302,6 +1328,18 @@ function InstagramTab({
         {refreshResult && (
           <p className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
             Token erfolgreich erneuert. Gültig für {Math.round(refreshResult.expires_in / 86400)} Tage.
+          </p>
+        )}
+
+        {cronError && (
+          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            {cronError}
+          </p>
+        )}
+
+        {cronResult && (
+          <p className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
+            Cron-Simulation erfolgreich: {cronResult.message} Gültig für {cronResult.expires_in_days} Tage bis {new Date(cronResult.expires_at).toLocaleString('de-DE')}.
           </p>
         )}
       </div>

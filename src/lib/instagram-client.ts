@@ -54,6 +54,22 @@ class InstagramApiClient {
       message: string;
     }>;
   }
+
+  async runCronRefresh(): Promise<{
+    success: boolean;
+    message: string;
+    expires_in_days: number;
+    expires_at: string;
+    timestamp: string;
+  }> {
+    return api.request('/refresh-token-cron.php', { method: 'GET' }) as Promise<{
+      success: boolean;
+      message: string;
+      expires_in_days: number;
+      expires_at: string;
+      timestamp: string;
+    }>;
+  }
 }
 
 export const instagramApi = new InstagramApiClient();

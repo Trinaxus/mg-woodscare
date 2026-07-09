@@ -19,10 +19,10 @@ header('Content-Type: application/json');
 $configFile = __DIR__ . '/instagram.config.php';
 $secret = $_ENV['INSTAGRAM_CRON_SECRET'] ?? '';
 
-// Optionaler Schutz bei HTTP-Aufrufen
-if (PHP_SAPI !== 'cli') {
+// Optionaler Schutz bei HTTP-Aufrufen (wenn ein Secret konfiguriert ist)
+if (PHP_SAPI !== 'cli' && !empty($secret)) {
     $providedSecret = $_GET['secret'] ?? '';
-    if (empty($secret) || empty($providedSecret) || !hash_equals($secret, $providedSecret)) {
+    if (empty($providedSecret) || !hash_equals($secret, $providedSecret)) {
         http_response_code(403);
         echo json_encode(['error' => 'Forbidden: cron secret fehlt oder ungültig']);
         exit;
