@@ -66,42 +66,6 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "MG Woodscare - Baumpflege & Sägewerk Leipzig" },
-      {
-        name: "description",
-        content:
-          "MG Woodscare Leipzig: professionelle Baumpflege, Baumfällung und Sägewerk mit Trockenkammer. Wir sind eins mit der Natur.",
-      },
-      {
-        name: "keywords",
-        content: "Baumpflege, Baumfällung, Sägewerk, Trockenkammer, Leipzig, Holz, Brennholz, Gartenpflege, MG Woodscare",
-      },
-      { name: "author", content: "MG Woodscare" },
-      { name: "robots", content: "index, follow" },
-      { name: "theme-color", content: "#0f172a" },
-      { property: "og:title", content: "MG Woodscare - Baumpflege & Sägewerk Leipzig" },
-      {
-        property: "og:description",
-        content:
-          "Professionelle Baumpflege, sichere Baumfällung und regionales Sägewerk mit Trockenkammer im Herzen von Leipzig.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://www.mg-woodscare.de/" },
-      { property: "og:image", content: "https://www.mg-woodscare.de/assets/logo_005.png" },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:locale", content: "de_DE" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "MG Woodscare - Baumpflege & Sägewerk Leipzig" },
-      {
-        name: "twitter:description",
-        content:
-          "Professionelle Baumpflege, sichere Baumfällung und regionales Sägewerk mit Trockenkammer im Herzen von Leipzig.",
-      },
-      { name: "twitter:image", content: "https://www.mg-woodscare.de/assets/logo_005.png" },
-    ],
-    links: [
-      { rel: "canonical", href: "https://www.mg-woodscare.de/" },
-      { rel: "icon", href: "/favicon.ico", sizes: "any" },
     ],
   }),
   component: RootComponent,
@@ -173,6 +137,25 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
     <html lang="de" className="dark">
       <head>
         <HeadContent />
+        <meta name="description" content="MG Woodscare Leipzig: professionelle Baumpflege, Baumfällung und Sägewerk mit Trockenkammer. Wir sind eins mit der Natur." />
+        <meta name="keywords" content="Baumpflege, Baumfällung, Sägewerk, Trockenkammer, Leipzig, Holz, Brennholz, Gartenpflege, MG Woodscare" />
+        <meta name="author" content="MG Woodscare" />
+        <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#0f172a" />
+        <meta property="og:title" content="MG Woodscare - Baumpflege & Sägewerk Leipzig" />
+        <meta property="og:description" content="Professionelle Baumpflege, sichere Baumfällung und regionales Sägewerk mit Trockenkammer im Herzen von Leipzig." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.mg-woodscare.de/" />
+        <meta property="og:image" content="https://www.mg-woodscare.de/assets/logo_005.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="de_DE" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="MG Woodscare - Baumpflege & Sägewerk Leipzig" />
+        <meta name="twitter:description" content="Professionelle Baumpflege, sichere Baumfällung und regionales Sägewerk mit Trockenkammer im Herzen von Leipzig." />
+        <meta name="twitter:image" content="https://www.mg-woodscare.de/assets/logo_005.png" />
+        <link rel="canonical" href="https://www.mg-woodscare.de/" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <script
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{

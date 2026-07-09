@@ -43,16 +43,18 @@ import { useContent } from "@/lib/content";
 import { defaultContent } from "@/data/defaultContent";
 
 export const Route = createFileRoute("/leistungen")({
-  head: () => ({
-    meta: [
+  head: () => {
+    const meta: ({ title: string } | { name: string; content: string })[] = [
       { title: "Leistungen – MG Woodscare Baumpflege & Sägewerk Leipzig" },
-      {
-        name: "description",
-        content: defaultContent.seo?.leistungenDescription || "",
-      },
-      { name: "keywords", content: defaultContent.seo?.leistungenKeywords || "" },
-    ],
-  }),
+    ];
+    if (defaultContent.seo?.leistungenDescription?.trim()) {
+      meta.push({ name: "description", content: defaultContent.seo.leistungenDescription.trim() });
+    }
+    if (defaultContent.seo?.leistungenKeywords?.trim()) {
+      meta.push({ name: "keywords", content: defaultContent.seo.leistungenKeywords.trim() });
+    }
+    return { meta };
+  },
   component: LeistungenPage,
 });
 
