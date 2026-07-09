@@ -37,6 +37,7 @@ const TABS = [
   { id: "features", label: "Sägewerk / Brennholz" },
   { id: "referenzen", label: "Referenzen" },
   { id: "kontakt", label: "Kontakt" },
+  { id: "social", label: "Social" },
   { id: "instagram", label: "Instagram" },
   { id: "impressum", label: "Impressum" },
   { id: "datenschutz", label: "Datenschutz" },
@@ -266,6 +267,7 @@ function AdminDashboard() {
             { id: "referenzen", label: "Referenzen" },
             { id: "kontakt", label: "Kontakt" },
           ]} onSelect={setTab} />
+          <TabButton id="social" label="Social" tab={tab} setTab={setTab} />
           <TabButton id="instagram" label="Instagram" tab={tab} setTab={setTab} />
           <TabDropdown label="Rechtliches" active={tab} options={[
             { id: "impressum", label: "Impressum" },
@@ -498,6 +500,20 @@ function AdminDashboard() {
             <TextField label="E-Mail" value={draft.kontakt.email} onChange={(v) => update("kontakt", { ...draft.kontakt, email: v })} />
             <TextField label="Adresse" value={draft.kontakt.address} onChange={(v) => update("kontakt", { ...draft.kontakt, address: v })} />
             <TextField label="Inhaber-Zeile" value={draft.kontakt.ownerLine} onChange={(v) => update("kontakt", { ...draft.kontakt, ownerLine: v })} />
+          </Card>
+        )}
+
+        {tab === "social" && (
+          <Card title="Social-Media Kanäle">
+            <p className="text-sm text-muted-foreground">
+              Trage die vollständigen Profil-URLs ein. Leere Felder werden auf der Seite ausgeblendet.
+            </p>
+            <TextField label="Facebook" value={draft.social.facebook} onChange={(v) => update("social", { ...draft.social, facebook: v })} />
+            <TextField label="Instagram" value={draft.social.instagram} onChange={(v) => update("social", { ...draft.social, instagram: v })} />
+            <TextField label="WhatsApp" value={draft.social.whatsapp} onChange={(v) => update("social", { ...draft.social, whatsapp: v })} />
+            <TextField label="YouTube" value={draft.social.youtube} onChange={(v) => update("social", { ...draft.social, youtube: v })} />
+            <TextField label="TikTok" value={draft.social.tiktok} onChange={(v) => update("social", { ...draft.social, tiktok: v })} />
+            <TextField label="LinkedIn" value={draft.social.linkedin} onChange={(v) => update("social", { ...draft.social, linkedin: v })} />
           </Card>
         )}
 

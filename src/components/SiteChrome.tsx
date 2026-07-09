@@ -1,11 +1,47 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Instagram, Phone, X, Menu } from "lucide-react";
+import { Instagram, Phone, X, Menu, Facebook, Youtube, Linkedin, MessageCircle, Music2 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { ApiStatus } from "./ApiStatus";
 import { SsrStatus } from "./SsrStatus";
 import { useContent } from "@/lib/content";
 import logo from "@/assets/logo_005.png";
+
+const socialIcons: Record<string, typeof Instagram> = {
+  facebook: Facebook,
+  instagram: Instagram,
+  whatsapp: MessageCircle,
+  youtube: Youtube,
+  tiktok: Music2,
+  linkedin: Linkedin,
+};
+
+function SocialLinks({ className = "" }: { className?: string }) {
+  const { content } = useContent();
+  const entries = Object.entries(content.social || {})
+    .filter(([key]) => socialIcons[key])
+    .filter(([, url]) => typeof url === "string" && url.trim() !== "");
+  if (entries.length === 0) return null;
+  return (
+    <div className={`flex items-center gap-2 ${className}`}>
+      {entries.map(([key, url]) => {
+        const Icon = socialIcons[key];
+        return (
+          <a
+            key={key}
+            href={url as string}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={key}
+            className="grid h-8 w-8 place-items-center rounded-full border border-border bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+          >
+            <Icon className="h-4 w-4" />
+          </a>
+        );
+      })}
+    </div>
+  );
+}
 
 const nav = [
   { to: "/leistungen", label: "Leistungen" },
@@ -69,15 +105,7 @@ export function SiteHeader() {
           )}
         </nav>
         <div className="flex items-center gap-2">
-          <a
-            href={content.instagram.url}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Instagram"
-            className="hidden h-9 w-9 place-items-center rounded-full border border-border bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:text-primary sm:grid"
-          >
-            <Instagram className="h-4 w-4" />
-          </a>
+          <SocialLinks className="hidden sm:flex" />
           <ThemeToggle />
           <Link
             to="/kontakt"
@@ -214,15 +242,7 @@ export function SiteFooter() {
           </div>
         )}
         <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-          <a
-            href={content.instagram.url}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Instagram"
-            className="grid h-8 w-8 place-items-center rounded-full border border-border bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:text-primary"
-          >
-            <Instagram className="h-4 w-4" />
-          </a>
+          <SocialLinks />
           <Link to="/impressum" className="hover:text-primary">
             Impressum
           </Link>

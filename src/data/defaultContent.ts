@@ -70,6 +70,14 @@ export interface SiteContent {
     postCount: number;
     selectedPostIds: string[];
   };
+  social: {
+    facebook: string;
+    instagram: string;
+    whatsapp: string;
+    youtube: string;
+    tiktok: string;
+    linkedin: string;
+  };
   impressum: {
     company: string;
     owner: string;
@@ -175,6 +183,14 @@ export const defaultContent: SiteContent = {
     label: "",
     postCount: 0,
     selectedPostIds: [],
+  },
+  social: {
+    facebook: "",
+    instagram: "",
+    whatsapp: "",
+    youtube: "",
+    tiktok: "",
+    linkedin: "",
   },
   impressum: {
     company: "",
