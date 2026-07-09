@@ -33,6 +33,7 @@ function SocialLinks({ className = "" }: { className?: string }) {
             target="_blank"
             rel="noreferrer"
             aria-label={key}
+            title={key}
             className="grid h-8 w-8 place-items-center rounded-full border border-border bg-card/70 text-foreground transition-colors hover:border-primary/60 hover:text-primary"
           >
             <Icon className="h-4 w-4" />
@@ -40,6 +41,26 @@ function SocialLinks({ className = "" }: { className?: string }) {
         );
       })}
     </div>
+  );
+}
+
+export function SocialSchema() {
+  const { content } = useContent();
+  const socialUrls = Object.values(content.social || {}).filter((url) => typeof url === "string" && url.trim() !== "");
+  if (socialUrls.length === 0) return null;
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: `${content.brand.name} ${content.brand.accentName}`.trim() || "MG Woodscare",
+    url: "https://www.mg-woodscare.de/",
+    sameAs: socialUrls,
+  };
+  return (
+    <script
+      type="application/ld+json"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
   );
 }
 

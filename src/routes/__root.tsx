@@ -2,6 +2,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 import { useEffect, useState, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useContent, ContentProvider } from "@/lib/content";
+import { SocialSchema } from "@/components/SiteChrome";
 import "@/styles.css";
 
 const queryClient = new QueryClient();
@@ -194,7 +195,10 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          <ContentProvider>{children}</ContentProvider>
+          <ContentProvider>
+            <SocialSchema />
+            {children}
+          </ContentProvider>
         </QueryClientProvider>
         <Scripts />
       </body>
