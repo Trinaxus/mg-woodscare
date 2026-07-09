@@ -32,6 +32,28 @@ class InstagramApiClient {
   async refreshToken(): Promise<{ access_token: string; expires_in: number }> {
     return this.get("?action=refresh") as Promise<{ access_token: string; expires_in: number }>;
   }
+
+  async fetchTokenStatus(): Promise<{
+    configured: boolean;
+    has_log: boolean;
+    last_refresh: string | null;
+    expires_at: string | null;
+    expires_in_days: number | null;
+    expires_in_seconds: number | null;
+    healthy: boolean;
+    message: string;
+  }> {
+    return api.request('/instagram-token-status.php', { method: 'GET' }) as Promise<{
+      configured: boolean;
+      has_log: boolean;
+      last_refresh: string | null;
+      expires_at: string | null;
+      expires_in_days: number | null;
+      expires_in_seconds: number | null;
+      healthy: boolean;
+      message: string;
+    }>;
+  }
 }
 
 export const instagramApi = new InstagramApiClient();

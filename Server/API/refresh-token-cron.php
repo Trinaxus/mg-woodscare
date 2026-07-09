@@ -112,10 +112,18 @@ if (file_put_contents($configFile, $configContent, LOCK_EX) === false) {
     exit;
 }
 
+$logFile = __DIR__ . '/../data/instagram-token-log.json';
+$logEntry = [
+    'last_refresh' => date('Y-m-d H:i:s'),
+    'expires_at' => date('Y-m-d H:i:s', time() + $expiresIn),
+    'expires_in_days' => round($expiresIn / 86400, 1),
+];
+file_put_contents($logFile, json_encode($logEntry, JSON_PRETTY_PRINT), LOCK_EX);
+
 echo json_encode([
     'success' => true,
     'message' => 'Instagram Access Token erfolgreich erneuert',
-    'expires_in_days' => round($expiresIn / 86400, 1),
-    'expires_at' => date('Y-m-d H:i:s', time() + $expiresIn),
-    'timestamp' => date('Y-m-d H:i:s'),
+    'expires_in_days' => $logEntry['expires_in_days'],
+    'expires_at' => $logEntry['expires_at'],
+    'timestamp' => $logEntry['last_refresh'],
 ]);

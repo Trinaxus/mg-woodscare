@@ -39,6 +39,12 @@ function decryptToken(string $ciphertext, string $key): string|false {
     return $plain !== false ? $plain : false;
 }
 
+function encryptToken(string $plain, string $key): string {
+    $iv = random_bytes(16);
+    $encrypted = openssl_encrypt($plain, 'AES-256-CBC', hash('sha256', $key, true), OPENSSL_RAW_DATA, $iv);
+    return base64_encode(base64_encode($iv) . '::' . base64_encode($encrypted));
+}
+
 $configFile = __DIR__ . '/instagram.config.php';
 if (!file_exists($configFile)) {
     http_response_code(500);
@@ -134,8 +140,43 @@ switch ($action) {
 
     case 'refresh':
         $url = "$baseUrl/refresh_access_token?grant_type=ig_refresh_token&access_token=$accessToken";
-        callInstagram($url);
-        break;
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        $refreshResponse = curl_exec($ch);
+        $refreshHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $refreshData = json_decode($refreshResponse, true);
+        if ($refreshHttpCode !== 200 || empty($refreshData['access_token'])) {
+            http_response_code($refreshHttpCode ?: 500);
+            echo $refreshResponse;
+            exit;
+        }
+
+        $newToken = $refreshData['access_token'];
+        $expiresIn = $refreshData['expires_in'] ?? 0;
+        $newEncryptedToken = encryptToken($newToken, $tokenKey);
+
+        $configContent = "<?php\nreturn [\n    'access_token_encrypted' => '" . addslashes($newEncryptedToken) . "',\n    'token_key' => '" . addslashes($tokenKey) . "',\n];\n";
+        file_put_contents($configFile, $configContent, LOCK_EX);
+
+        $logFile = __DIR__ . '/../data/instagram-token-log.json';
+        $logEntry = [
+            'last_refresh' => date('Y-m-d H:i:s'),
+            'expires_at' => date('Y-m-d H:i:s', time() + $expiresIn),
+            'expires_in_days' => round($expiresIn / 86400, 1),
+        ];
+        file_put_contents($logFile, json_encode($logEntry, JSON_PRETTY_PRINT), LOCK_EX);
+
+        echo json_encode([
+            'success' => true,
+            'access_token' => $newToken,
+            'expires_in' => $expiresIn,
+            'expires_at' => $logEntry['expires_at'],
+            'timestamp' => $logEntry['last_refresh'],
+        ]);
+        exit;
 
     default:
         http_response_code(400);

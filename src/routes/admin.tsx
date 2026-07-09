@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud, Instagram, Play, ChevronDown } from "lucide-react";
 
 import { SiteFooter } from "@/components/SiteChrome";
@@ -787,7 +787,34 @@ function InstagramTab({
   const [refreshResult, setRefreshResult] = useState<{ access_token: string; expires_in: number } | null>(null);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [tokenStatus, setTokenStatus] = useState<{
+    configured: boolean;
+    has_log: boolean;
+    last_refresh: string | null;
+    expires_at: string | null;
+    expires_in_days: number | null;
+    expires_in_seconds: number | null;
+    healthy: boolean;
+    message: string;
+  } | null>(null);
+  const [tokenStatusLoading, setTokenStatusLoading] = useState(false);
   const postCount = draft.instagram.postCount ?? 6;
+
+  const loadTokenStatus = async () => {
+    setTokenStatusLoading(true);
+    try {
+      const status = await instagramApi.fetchTokenStatus();
+      setTokenStatus(status);
+    } catch (err) {
+      console.error("Token-Status laden fehlgeschlagen:", err);
+    } finally {
+      setTokenStatusLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTokenStatus();
+  }, []);
 
   const testConnection = async () => {
     setLoading(true);
@@ -874,6 +901,7 @@ function InstagramTab({
     try {
       const data = await instagramApi.refreshToken();
       setRefreshResult(data);
+      await loadTokenStatus();
     } catch (err) {
       setRefreshError(err instanceof Error ? err.message : "Unbekannter Fehler");
     } finally {
@@ -1203,20 +1231,67 @@ function InstagramTab({
       </div>
 
       <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Instagram className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium">Token-Refresh testen</span>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`grid h-10 w-10 place-items-center rounded-full ${tokenStatus?.healthy ? 'bg-green-500/15 text-green-600' : tokenStatus?.configured ? 'bg-amber-500/15 text-amber-600' : 'bg-destructive/15 text-destructive'}`}>
+              <Instagram className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-medium">Instagram Token</p>
+              <p className="text-xs text-muted-foreground">
+                {tokenStatusLoading
+                  ? "Status wird geladen..."
+                  : tokenStatus?.message || "Unbekannt"}
+              </p>
+            </div>
           </div>
-          <button
-            onClick={testRefresh}
-            disabled={refreshLoading}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
-          >
-            <Play className="h-4 w-4" />
-            {refreshLoading ? "Teste..." : "Refresh testen"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={loadTokenStatus}
+              disabled={tokenStatusLoading}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary disabled:opacity-50"
+            >
+              Aktualisieren
+            </button>
+            <button
+              onClick={testRefresh}
+              disabled={refreshLoading}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
+            >
+              <Play className="h-4 w-4" />
+              {refreshLoading ? "Erneuern..." : "Manuell erneuern"}
+            </button>
+          </div>
         </div>
+
+        {tokenStatus && !tokenStatusLoading && (
+          <div className="mt-4 grid gap-2 text-sm">
+            <div className="flex justify-between border-b border-border/60 py-2">
+              <span className="text-muted-foreground">Status</span>
+              <span className={tokenStatus.healthy ? 'text-green-600' : 'text-amber-600'}>
+                {tokenStatus.healthy ? 'Gesund' : 'Achtung'}
+              </span>
+            </div>
+            {tokenStatus.last_refresh && (
+              <div className="flex justify-between border-b border-border/60 py-2">
+                <span className="text-muted-foreground">Letztes Refresh</span>
+                <span>{new Date(tokenStatus.last_refresh).toLocaleString('de-DE')}</span>
+              </div>
+            )}
+            {tokenStatus.expires_at && (
+              <div className="flex justify-between border-b border-border/60 py-2">
+                <span className="text-muted-foreground">Gültig bis</span>
+                <span>{new Date(tokenStatus.expires_at).toLocaleString('de-DE')}</span>
+              </div>
+            )}
+            {typeof tokenStatus.expires_in_days === 'number' && (
+              <div className="flex justify-between py-2">
+                <span className="text-muted-foreground">Verbleibend</span>
+                <span className="font-medium">{tokenStatus.expires_in_days} Tage</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {refreshError && (
           <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
@@ -1225,17 +1300,8 @@ function InstagramTab({
         )}
 
         {refreshResult && (
-          <div className="mt-4 text-sm">
-            <p className="text-muted-foreground">
-              Token gültig für <span className="font-medium text-foreground">{Math.round(refreshResult.expires_in / 86400)} Tage</span>
-            </p>
-            <p className="mt-1 break-all text-xs text-muted-foreground">{refreshResult.access_token.slice(0, 20)}…</p>
-          </div>
-        )}
-
-        {!refreshResult && !refreshError && !refreshLoading && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Prüft, ob der Access Token verlängert werden kann.
+          <p className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
+            Token erfolgreich erneuert. Gültig für {Math.round(refreshResult.expires_in / 86400)} Tage.
           </p>
         )}
       </div>
