@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState, useEffect } from "react";
-import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud, Instagram, Play, ChevronDown } from "lucide-react";
+import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud, Instagram, Play, ChevronDown, TreeDeciduous, TreePine, Axe, Hammer, Wrench, Scissors, Truck, Droplets, Wind, Sun, Snowflake, Umbrella, Flame, Leaf, Sprout, Flower, Trees, Warehouse, Factory, Home, Building, ShieldCheck, Shield, BadgeCheck, HardHat, Ruler, Recycle, Trash2 } from "lucide-react";
 
 import { SiteFooter } from "@/components/SiteChrome";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -8,7 +8,7 @@ import { SeoTab } from "@/components/SeoTab";
 import { api } from "@/lib/api";
 import { useContent, DEFAULT_ADMIN_PASSWORD } from "@/lib/content";
 import { instagramApi } from "@/lib/instagram-client";
-import { type InstagramAccount, type InstagramMedia } from "@/lib/instagram";
+import { type InstagramMedia } from "@/lib/instagram";
 import { defaultContent, type SiteContent } from "@/data/defaultContent";
 import logo from "@/assets/logo_005.png";
 
@@ -326,17 +326,47 @@ function AdminDashboard() {
               blank={{ icon: "Leaf", title: "", text: "" }}
               render={(item, set) => (
                 <div className="grid gap-3">
-                  <div className="grid gap-3 md:grid-cols-[160px_1fr]">
-                    <TextField label="Icon" value={item.icon} onChange={(v) => set({ ...item, icon: v })} placeholder="z.B. TreeDeciduous" />
+                  <div className="grid gap-3 md:grid-cols-[200px_1fr]">
+                    <IconPicker
+                      value={item.icon}
+                      onChange={(icon) => set({ ...item, icon })}
+                      icons={[
+                        { key: "TreeDeciduous", Icon: TreeDeciduous },
+                        { key: "TreePine", Icon: TreePine },
+                        { key: "Trees", Icon: Trees },
+                        { key: "Axe", Icon: Axe },
+                        { key: "Hammer", Icon: Hammer },
+                        { key: "Wrench", Icon: Wrench },
+                        { key: "Scissors", Icon: Scissors },
+                        { key: "Truck", Icon: Truck },
+                        { key: "Droplets", Icon: Droplets },
+                        { key: "Wind", Icon: Wind },
+                        { key: "Sun", Icon: Sun },
+                        { key: "Snowflake", Icon: Snowflake },
+                        { key: "Umbrella", Icon: Umbrella },
+                        { key: "Flame", Icon: Flame },
+                        { key: "Leaf", Icon: Leaf },
+                        { key: "Sprout", Icon: Sprout },
+                        { key: "Flower", Icon: Flower },
+                        { key: "Warehouse", Icon: Warehouse },
+                        { key: "Factory", Icon: Factory },
+                        { key: "Home", Icon: Home },
+                        { key: "Building", Icon: Building },
+                        { key: "ShieldCheck", Icon: ShieldCheck },
+                        { key: "Shield", Icon: Shield },
+                        { key: "BadgeCheck", Icon: BadgeCheck },
+                        { key: "HardHat", Icon: HardHat },
+                        { key: "Ruler", Icon: Ruler },
+                        { key: "Recycle", Icon: Recycle },
+                        { key: "Trash2", Icon: Trash2 },
+                      ]}
+                    />
                     <TextField label="Titel" value={item.title} onChange={(v) => set({ ...item, title: v })} />
                   </div>
                   <TextArea label="Text" value={item.text} onChange={(v) => set({ ...item, text: v })} />
                 </div>
               )}
             />
-            <p className="mt-3 text-xs text-muted-foreground">
-              Verfügbare Icons: TreeDeciduous, Axe, Sprout, Flame, Warehouse, ShieldCheck, Leaf
-            </p>
           </Card>
         )}
 
@@ -769,21 +799,11 @@ function InstagramTab({
   const [posts, setPosts] = useState<InstagramMedia[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mentions, setMentions] = useState<InstagramMedia[] | null>(null);
-  const [mentionsLoading, setMentionsLoading] = useState(false);
-  const [mentionsError, setMentionsError] = useState<string | null>(null);
-  const [account, setAccount] = useState<InstagramAccount | null>(null);
-  const [accountLoading, setAccountLoading] = useState(false);
-  const [accountError, setAccountError] = useState<string | null>(null);
   const [children, setChildren] = useState<InstagramMedia[] | null>(null);
   const [childrenLoading, setChildrenLoading] = useState(false);
   const [childrenError, setChildrenError] = useState<string | null>(null);
   const [mediaId, setMediaId] = useState("");
   const [mediaPermalink, setMediaPermalink] = useState("");
-  const [comments, setComments] = useState<{ id: string; text: string; username?: string; timestamp: string }[] | null>(null);
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [commentsError, setCommentsError] = useState<string | null>(null);
-  const [commentsMediaId, setCommentsMediaId] = useState("");
   const [refreshResult, setRefreshResult] = useState<{ access_token: string; expires_in: number } | null>(null);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
@@ -794,6 +814,7 @@ function InstagramTab({
     expires_at: string | null;
     expires_in_days: number | null;
     expires_in_seconds: number | null;
+    token_hash: string | null;
     healthy: boolean;
     message: string;
   } | null>(null);
@@ -833,34 +854,6 @@ function InstagramTab({
     }
   };
 
-  const testMentions = async () => {
-    setMentionsLoading(true);
-    setMentionsError(null);
-    setMentions(null);
-    try {
-      const data = await instagramApi.fetchMentions();
-      setMentions(data);
-    } catch (err) {
-      setMentionsError(err instanceof Error ? err.message : "Unbekannter Fehler");
-    } finally {
-      setMentionsLoading(false);
-    }
-  };
-
-  const testAccount = async () => {
-    setAccountLoading(true);
-    setAccountError(null);
-    setAccount(null);
-    try {
-      const data = await instagramApi.fetchAccount();
-      setAccount(data);
-    } catch (err) {
-      setAccountError(err instanceof Error ? err.message : "Unbekannter Fehler");
-    } finally {
-      setAccountLoading(false);
-    }
-  };
-
   const testChildren = async () => {
     if (!mediaId.trim()) {
       setChildrenError("Bitte eine Media-ID eingeben.");
@@ -876,24 +869,6 @@ function InstagramTab({
       setChildrenError(err instanceof Error ? err.message : "Unbekannter Fehler");
     } finally {
       setChildrenLoading(false);
-    }
-  };
-
-  const testComments = async () => {
-    if (!commentsMediaId.trim()) {
-      setCommentsError("Bitte eine Media-ID eingeben.");
-      return;
-    }
-    setCommentsLoading(true);
-    setCommentsError(null);
-    setComments(null);
-    try {
-      const data = await instagramApi.fetchComments(commentsMediaId.trim());
-      setComments(data);
-    } catch (err) {
-      setCommentsError(err instanceof Error ? err.message : "Unbekannter Fehler");
-    } finally {
-      setCommentsLoading(false);
     }
   };
 
@@ -971,31 +946,68 @@ function InstagramTab({
 
         {posts && (
           <div className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              {posts.length} Posts gefunden
-            </p>
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              {posts.slice(0, 6).map((post) => (
-                <a
-                  key={post.id}
-                  href={post.permalink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-background"
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {posts.length} Posts geladen
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => update("instagram", { ...draft.instagram, selectedPostIds: posts.map((p) => p.id) })}
+                  className="text-xs font-medium text-primary hover:underline"
                 >
-                  <img
-                    src={post.media_type === "VIDEO" ? post.thumbnail_url || post.media_url : post.media_url}
-                    alt={post.caption?.slice(0, 80) || "Instagram Post"}
-                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  {post.media_type === "VIDEO" && (
-                    <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-[10px] font-medium text-white">
-                      VIDEO
-                    </span>
-                  )}
-                </a>
-              ))}
+                  Alle anzeigen
+                </button>
+                <span className="text-muted-foreground">|</span>
+                <button
+                  onClick={() => update("instagram", { ...draft.instagram, selectedPostIds: [] })}
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Alle ausblenden
+                </button>
+              </div>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Wähle die Beiträge aus, die auf der Startseite angezeigt werden sollen. Ist nichts ausgewählt, werden alle angezeigt.
+            </p>
+            <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+              {posts.map((post) => {
+                const selected = draft.instagram.selectedPostIds.includes(post.id);
+                return (
+                  <button
+                    key={post.id}
+                    onClick={() => {
+                      const next = selected
+                        ? draft.instagram.selectedPostIds.filter((id) => id !== post.id)
+                        : [...draft.instagram.selectedPostIds, post.id];
+                      update("instagram", { ...draft.instagram, selectedPostIds: next });
+                    }}
+                    className={`group relative aspect-square overflow-hidden rounded-2xl border-2 bg-background transition-all ${selected ? 'border-primary ring-2 ring-primary/20' : 'border-border opacity-60 hover:opacity-100'}`}
+                    title={post.caption?.slice(0, 120) || "Instagram Post"}
+                  >
+                    <img
+                      src={post.media_type === "VIDEO" ? post.thumbnail_url || post.media_url : post.media_url}
+                      alt={post.caption?.slice(0, 80) || "Instagram Post"}
+                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className={`absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                      <div className={`grid h-8 w-8 place-items-center rounded-full border-2 ${selected ? 'border-primary bg-primary text-primary-foreground' : 'border-white bg-white/20 text-white'}`}>
+                        {selected ? '✓' : '+'}
+                      </div>
+                    </div>
+                    {post.media_type === "VIDEO" && (
+                      <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-1 text-[10px] font-medium text-white">
+                        VIDEO
+                      </span>
+                    )}
+                    {post.media_type === "CAROUSEL_ALBUM" && (
+                      <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-1 text-[10px] font-medium text-white">
+                        GALERIE
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -1003,109 +1015,6 @@ function InstagramTab({
         {!posts && !error && !loading && (
           <p className="mt-4 text-sm text-muted-foreground">
             Klicke auf „Verbindung testen“, um zu prüfen, ob der Access Token funktioniert.
-          </p>
-        )}
-      </div>
-
-      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Instagram className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium">Erwähnungen testen</span>
-          </div>
-          <button
-            onClick={testMentions}
-            disabled={mentionsLoading}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
-          >
-            <Play className="h-4 w-4" />
-            {mentionsLoading ? "Teste..." : "Erwähnungen testen"}
-          </button>
-        </div>
-
-        {mentionsError && (
-          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-            {mentionsError}
-          </p>
-        )}
-
-        {mentions && (
-          <div className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              {mentions.length} Erwähnung(en) gefunden
-            </p>
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              {mentions.slice(0, 6).map((post) => (
-                <a
-                  key={post.id}
-                  href={post.permalink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-background"
-                >
-                  <img
-                    src={post.media_type === "VIDEO" ? post.thumbnail_url || post.media_url : post.media_url}
-                    alt={post.caption?.slice(0, 80) || "Instagram Erwähnung"}
-                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  {post.media_type === "VIDEO" && (
-                    <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-1 text-[10px] font-medium text-white">
-                      VIDEO
-                    </span>
-                  )}
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {!mentions && !mentionsError && !mentionsLoading && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Klicke auf „Erwähnungen testen“, um zu prüfen, ob der Token Erwähnungen deines Accounts abrufen darf.
-          </p>
-        )}
-      </div>
-
-      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Instagram className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium">Account-Info testen</span>
-          </div>
-          <button
-            onClick={testAccount}
-            disabled={accountLoading}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
-          >
-            <Play className="h-4 w-4" />
-            {accountLoading ? "Teste..." : "Account testen"}
-          </button>
-        </div>
-
-        {accountError && (
-          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-            {accountError}
-          </p>
-        )}
-
-        {account && (
-          <div className="mt-4 text-sm">
-            <p className="text-muted-foreground">
-              <span className="font-medium text-foreground">@{account.username}</span> · {account.account_type} · {account.media_count} Beiträge
-            </p>
-            {account.followers_count !== undefined && (
-              <p className="mt-1 text-muted-foreground">{account.followers_count} Follower</p>
-            )}
-            {account.biography && (
-              <p className="mt-2 max-w-xl text-muted-foreground">{account.biography}</p>
-            )}
-          </div>
-        )}
-
-        {!account && !accountError && !accountLoading && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Prüft, ob Profil-Informationen (Username, Account-Typ, Follower, Biografie) abgerufen werden können.
           </p>
         )}
       </div>
@@ -1195,60 +1104,6 @@ function InstagramTab({
       </div>
 
       <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Instagram className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium">Kommentare testen</span>
-          </div>
-          <button
-            onClick={testComments}
-            disabled={commentsLoading}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03] disabled:opacity-50"
-          >
-            <Play className="h-4 w-4" />
-            {commentsLoading ? "Teste..." : "Kommentare testen"}
-          </button>
-        </div>
-        <div className="mt-3">
-          <TextField
-            label="Media-ID eines Beitrags"
-            value={commentsMediaId}
-            onChange={setCommentsMediaId}
-            placeholder="z. B. 12345678901234567"
-          />
-        </div>
-
-        {commentsError && (
-          <p className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-            {commentsError}
-          </p>
-        )}
-
-        {comments && (
-          <div className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              {comments.length} Kommentar(e) gefunden
-            </p>
-            <div className="mt-3 max-h-60 overflow-y-auto rounded-2xl border border-border bg-background">
-              {comments.slice(0, 10).map((comment) => (
-                <div key={comment.id} className="border-b border-border p-3 text-sm last:border-0">
-                  <p className="font-medium text-foreground">{comment.username || "Unbekannt"}</p>
-                  <p className="text-muted-foreground">{comment.text}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{new Date(comment.timestamp).toLocaleString()}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {!comments && !commentsError && !commentsLoading && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Gib die Media-ID eines Beitrags ein, um zu testen, ob Kommentare abgerufen werden können.
-          </p>
-        )}
-      </div>
-
-      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className={`grid h-10 w-10 place-items-center rounded-full ${tokenStatus?.healthy ? 'bg-green-500/15 text-green-600' : tokenStatus?.configured ? 'bg-amber-500/15 text-amber-600' : 'bg-destructive/15 text-destructive'}`}>
@@ -1311,9 +1166,15 @@ function InstagramTab({
               </div>
             )}
             {typeof tokenStatus.expires_in_days === 'number' && (
-              <div className="flex justify-between py-2">
+              <div className="flex justify-between border-b border-border/60 py-2">
                 <span className="text-muted-foreground">Verbleibend</span>
                 <span className="font-medium">{tokenStatus.expires_in_days} Tage</span>
+              </div>
+            )}
+            {tokenStatus.token_hash && (
+              <div className="flex justify-between py-2">
+                <span className="text-muted-foreground">Token-Hash</span>
+                <span className="font-mono text-xs">{tokenStatus.token_hash}</span>
               </div>
             )}
           </div>
@@ -1344,6 +1205,69 @@ function InstagramTab({
         )}
       </div>
     </Card>
+  );
+}
+
+function IconPicker({
+  value,
+  onChange,
+  icons,
+}: {
+  value: string;
+  onChange: (icon: string) => void;
+  icons: { key: string; Icon: React.ComponentType<{ className?: string }> }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const SelectedIcon = icons.find((i) => i.key === value)?.Icon || icons[0]?.Icon;
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <span className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Icon</span>
+      <button
+        type="button"
+        onClick={() => setOpen((s) => !s)}
+        className="flex h-11 w-full items-center justify-between rounded-xl border border-border bg-background/60 px-3 text-sm transition-colors hover:border-primary"
+      >
+        <span className="text-muted-foreground">{SelectedIcon ? <SelectedIcon className="h-5 w-5" /> : "—"}</span>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 w-64 rounded-2xl border border-border bg-card/95 p-2 shadow-2xl backdrop-blur-xl">
+          <div className="grid grid-cols-5 gap-1">
+            {icons.map(({ key, Icon }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  onChange(key);
+                  setOpen(false);
+                }}
+                className={`grid h-10 w-10 place-items-center rounded-xl transition-colors ${
+                  value === key
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+                title={key}
+              >
+                <Icon className="h-5 w-5" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1495,9 +1419,22 @@ function TabDropdown({
   onSelect: (id: TabId) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   const isActive = options.some((o) => o.id === active);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
   return (
-    <div className="relative" onMouseLeave={() => setOpen(false)}>
+    <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((s) => !s)}
         className={`inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-sm transition-colors ${

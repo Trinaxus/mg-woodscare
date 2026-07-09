@@ -166,6 +166,7 @@ switch ($action) {
             'last_refresh' => date('Y-m-d H:i:s'),
             'expires_at' => date('Y-m-d H:i:s', time() + $expiresIn),
             'expires_in_days' => round($expiresIn / 86400, 1),
+            'token_hash' => substr(hash('sha256', $newToken), 0, 16),
         ];
         file_put_contents($logFile, json_encode($logEntry, JSON_PRETTY_PRINT), LOCK_EX);
 

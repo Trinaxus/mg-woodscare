@@ -33,7 +33,7 @@ export const Route = createFileRoute("/")({
       { title: "MG Woodscare – Baumpflege & Sägewerk Leipzig" },
       {
         name: "description",
-        content: "Professionelle Baumpflege, Baumfällung, Seilklettertechnik SKT und Sägewerk in Leipzig. 15+ Jahre Erfahrung. Notdienst 24/7 für Leipzig & Umland.",
+        content: "Professionelle Baumpflege, Baumfällung, Seilklettertechnik SKT und Sägewerk in Leipzig. 20+ Jahre Erfahrung. Notdienst 24/7 für Leipzig & Umland.",
       },
     ],
   }),
@@ -219,7 +219,7 @@ function LandingPage() {
           </ScrollReveal>
           <ScrollReveal delay={100}>
             <p className="mt-4 text-lg text-foreground/75">
-              15+ Jahre Erfahrung, Notdienst 24/7, nachhaltige Holzverarbeitung
+              20+ Jahre Erfahrung, Notdienst 24/7, nachhaltige Holzverarbeitung
             </p>
           </ScrollReveal>
           <ScrollReveal delay={200}>

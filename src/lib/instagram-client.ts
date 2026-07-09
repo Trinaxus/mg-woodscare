@@ -40,6 +40,7 @@ class InstagramApiClient {
     expires_at: string | null;
     expires_in_days: number | null;
     expires_in_seconds: number | null;
+    token_hash: string | null;
     healthy: boolean;
     message: string;
   }> {
@@ -50,6 +51,7 @@ class InstagramApiClient {
       expires_at: string | null;
       expires_in_days: number | null;
       expires_in_seconds: number | null;
+      token_hash: string | null;
       healthy: boolean;
       message: string;
     }>;

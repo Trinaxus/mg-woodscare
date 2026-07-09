@@ -25,6 +25,7 @@ $status = [
     'expires_at' => null,
     'expires_in_days' => null,
     'expires_in_seconds' => null,
+    'token_hash' => null,
     'healthy' => false,
     'message' => 'Kein Token konfiguriert',
 ];
@@ -41,6 +42,7 @@ if (file_exists($logFile)) {
         $status['has_log'] = true;
         $status['last_refresh'] = $log['last_refresh'] ?? null;
         $status['expires_at'] = $log['expires_at'] ?? null;
+        $status['token_hash'] = $log['token_hash'] ?? null;
 
         if (!empty($log['expires_at'])) {
             $expiresAt = strtotime($log['expires_at']);

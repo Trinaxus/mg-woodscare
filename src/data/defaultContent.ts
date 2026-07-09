@@ -68,6 +68,7 @@ export interface SiteContent {
     url: string;
     label: string;
     postCount: number;
+    selectedPostIds: string[];
   };
   impressum: {
     company: string;
@@ -281,6 +282,7 @@ export const defaultContent: SiteContent = {
     url: "https://www.instagram.com/mg_woodscare_baumpflegedienst_",
     label: "Aktuelle Baustellen auf Instagram",
     postCount: 6,
+    selectedPostIds: [],
   },
   impressum: {
     company: "MG Woodscare – Baumpflegedienst",

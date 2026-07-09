@@ -8,6 +8,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 export function InstagramFeed() {
   const { content } = useContent();
   const postCount = content.instagram.postCount ?? 6;
+  const selectedPostIds = content.instagram.selectedPostIds ?? [];
 
   const [account, setAccount] = useState<InstagramAccount | null>(null);
   const [posts, setPosts] = useState<InstagramMedia[]>([]);
@@ -37,7 +38,13 @@ export function InstagramFeed() {
         ]);
         if (!mounted) return;
         setAccount(accountData);
-        setPosts(feed.data ?? []);
+        const allPosts = feed.data ?? [];
+        const filteredPosts = selectedPostIds.length > 0
+          ? selectedPostIds
+              .map((id) => allPosts.find((post) => post.id === id))
+              .filter((post): post is InstagramMedia => !!post)
+          : allPosts;
+        setPosts(filteredPosts);
       } catch (err) {
         if (!mounted) return;
         setError(err instanceof Error ? err.message : "Instagram Feed konnte nicht geladen werden.");
@@ -49,7 +56,7 @@ export function InstagramFeed() {
     return () => {
       mounted = false;
     };
-  }, [postCount]);
+  }, [postCount, selectedPostIds]);
 
   if (postCount === 0) return null;
 
