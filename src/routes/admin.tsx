@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud, Instagram, Play } from "lucide-react";
+import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud, Instagram, Play, ChevronDown } from "lucide-react";
 
 import { SiteFooter } from "@/components/SiteChrome";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -11,6 +11,30 @@ import { instagramApi } from "@/lib/instagram-client";
 import { type InstagramAccount, type InstagramMedia } from "@/lib/instagram";
 import { defaultContent, type SiteContent } from "@/data/defaultContent";
 import logo from "@/assets/logo_005.png";
+
+function extractShortcode(input: string): string | null {
+  const match = input.match(/(?:instagram\.com\/p\/|instagram\.com\/reel\/|instagram\.com\/tv\/|^\/p\/)([A-Za-z0-9_-]+)/);
+  if (match) return match[1];
+  return /^[A-Za-z0-9_-]+$/.test(input) ? input : null;
+}
+
+function shortcodeToMediaId(shortcode: string): string | null {
+  try {
+    const base64 = shortcode
+      .replace(/-/g, "+")
+      .replace(/_/g, "/")
+      .padEnd(shortcode.length + ((4 - (shortcode.length % 4)) % 4), "=");
+    const binary = atob(base64);
+    // Instagram-Shortcodes kodieren eine 64-Bit-ID (8 Bytes, big-endian)
+    const bytes = binary.slice(0, 8);
+    const hex = Array.from(bytes)
+      .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
+      .join("");
+    return BigInt("0x" + hex).toString();
+  } catch {
+    return null;
+  }
+}
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -189,24 +213,30 @@ function AdminDashboard() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-4">
-          <div className="flex items-center gap-3">
-            <Link to="/" className="rounded-full transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-              <img
-                src={logo}
-                alt="MG Woodscare Logo"
-                className="h-12 w-12 rounded-full object-cover shadow-glow"
-              />
-            </Link>
-            <div>
-              <p className="font-display text-lg font-semibold leading-none">Admin</p>
-              <p className="text-xs text-muted-foreground">MG Woodscare Content</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
+      <header className="fixed top-0 z-50 w-full border-b border-border/60 bg-background/70 backdrop-blur-xl">
+        <div
+          className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
+          style={{
+            height: `${content.hairline?.thickness ?? 0.5}px`,
+            backgroundImage: `linear-gradient(to right, transparent, ${content.hairline?.color || "hsl(var(--primary))"}, transparent)`,
+            opacity: content.hairline?.opacity ?? 1,
+          }}
+        />
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-2">
+          <Link to="/" className="flex items-center gap-2 font-display text-xl font-semibold">
+            <img
+              src={logo}
+              alt="MG Woodscare Logo"
+              className="h-16 w-16 rounded-full object-cover shadow-glow"
+            />
+            <span>
+              {content.brand.name} <span className="text-primary">{content.brand.accentName}</span>
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-2">
             {notice && (
-              <span className="rounded-full bg-primary/15 px-3 py-1 text-xs text-primary">
+              <span className="hidden rounded-full bg-primary/15 px-3 py-1 text-xs text-primary sm:inline-flex">
                 {notice}
               </span>
             )}
@@ -221,11 +251,13 @@ function AdminDashboard() {
                 e.target.value = "";
               }}
             />
-            <ToolbarBtn onClick={() => fileRef.current?.click()} icon={Upload} label="Importieren" />
-            <ToolbarBtn onClick={doExport} icon={Download} label="Exportieren" />
-            <ToolbarBtn onClick={reset} icon={RotateCcw} label="Zurücksetzen" />
+            <div className="hidden flex-wrap items-center gap-2 sm:flex">
+              <ToolbarBtn onClick={() => fileRef.current?.click()} icon={Upload} label="Importieren" />
+              <ToolbarBtn onClick={doExport} icon={Download} label="Exportieren" />
+              <ToolbarBtn onClick={reset} icon={RotateCcw} label="Zurücksetzen" />
+            </div>
             <span className="inline-flex items-center gap-2 rounded-full border border-primary bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
-              <Cloud className="h-3.5 w-3.5" /> API-Modus (aktiv)
+              <Cloud className="h-3.5 w-3.5" /> API
             </span>
             <ThemeToggle />
             <button
@@ -236,32 +268,33 @@ function AdminDashboard() {
               <Save className="h-4 w-4" /> Speichern
             </button>
             <ToolbarBtn onClick={logoutAdmin} icon={LogOut} label="Logout" />
-            <Link
-              to="/"
-              className="rounded-full border border-border px-4 py-2 text-sm hover:border-primary/60"
-            >
-              Vorschau ↗
-            </Link>
           </div>
-        </div>
-        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 sm:px-6 pb-3">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`shrink-0 rounded-full px-4 py-2 text-sm transition-colors ${
-                tab === t.id
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-primary"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
         </div>
       </header>
 
-      <main className="flex-1 mx-auto max-w-6xl w-full px-4 sm:px-6 py-10">
+      <nav className="sticky top-[72px] z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 sm:px-6 py-3">
+          <TabButton id="brand" label="Marke" tab={tab} setTab={setTab} />
+          <TabDropdown label="Inhalt" active={tab} options={[
+            { id: "hero", label: "Hero" },
+            { id: "stats", label: "Zahlen" },
+            { id: "leistungen", label: "Leistungen" },
+            { id: "ueberUns", label: "Über uns / Team" },
+            { id: "features", label: "Sägewerk / Brennholz" },
+            { id: "referenzen", label: "Referenzen" },
+            { id: "kontakt", label: "Kontakt" },
+          ]} onSelect={setTab} />
+          <TabButton id="instagram" label="Instagram" tab={tab} setTab={setTab} />
+          <TabDropdown label="Rechtliches" active={tab} options={[
+            { id: "impressum", label: "Impressum" },
+            { id: "datenschutz", label: "Datenschutz" },
+          ]} onSelect={setTab} />
+          <TabButton id="seo" label="SEO" tab={tab} setTab={setTab} />
+          <TabButton id="einstellungen" label="Einstellungen" tab={tab} setTab={setTab} />
+        </div>
+      </nav>
+
+      <main className="flex-1 mx-auto max-w-6xl w-full px-4 sm:px-6 pb-10 pt-32">
         {tab === "brand" && (
           <Card title="Marke">
             <TextField label="Name" value={draft.brand.name} onChange={(v) => update("brand", { ...draft.brand, name: v })} />
@@ -742,7 +775,7 @@ function ToolbarBtn({
   );
 }
 
-const POST_COUNT_OPTIONS = [6, 8, 10, 20, 50];
+const POST_COUNT_OPTIONS = [0, 3, 6, 8, 10, 20, 50];
 
 function InstagramTab({
   draft,
@@ -764,6 +797,7 @@ function InstagramTab({
   const [childrenLoading, setChildrenLoading] = useState(false);
   const [childrenError, setChildrenError] = useState<string | null>(null);
   const [mediaId, setMediaId] = useState("");
+  const [mediaPermalink, setMediaPermalink] = useState("");
   const [comments, setComments] = useState<{ id: string; text: string; username?: string; timestamp: string }[] | null>(null);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentsError, setCommentsError] = useState<string | null>(null);
@@ -771,7 +805,7 @@ function InstagramTab({
   const [refreshResult, setRefreshResult] = useState<{ access_token: string; expires_in: number } | null>(null);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
-  const postCount = draft.instagram.postCount || 6;
+  const postCount = draft.instagram.postCount ?? 6;
 
   const testConnection = async () => {
     setLoading(true);
@@ -880,7 +914,7 @@ function InstagramTab({
           className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none transition-colors focus:border-primary"
         >
           {POST_COUNT_OPTIONS.map((n) => (
-            <option key={n} value={n}>{n} Beiträge</option>
+            <option key={n} value={n}>{n === 0 ? "Deaktiviert" : `${n} Beiträge`}</option>
           ))}
         </select>
       </label>
@@ -1065,10 +1099,25 @@ function InstagramTab({
         </div>
         <div className="mt-3">
           <TextField
+            label="Permalink oder Shortcode (z. B. https://www.instagram.com/p/DOONfwbiPDH/)"
+            value={mediaPermalink}
+            onChange={(v) => {
+              setMediaPermalink(v);
+              const shortcode = extractShortcode(v);
+              if (shortcode) {
+                const id = shortcodeToMediaId(shortcode);
+                if (id) setMediaId(id);
+              }
+            }}
+            placeholder="https://www.instagram.com/p/DOONfwbiPDH/"
+          />
+        </div>
+        <div className="mt-3">
+          <TextField
             label="Media-ID eines Carousel-Beitrags"
             value={mediaId}
             onChange={setMediaId}
-            placeholder="z. B. 12345678901234567"
+            placeholder="wird automatisch aus dem Permalink ermittelt"
           />
         </div>
 
@@ -1315,6 +1364,80 @@ function ListEditor<T>({
       >
         + Eintrag hinzufügen
       </button>
+    </div>
+  );
+}
+
+function TabButton({
+  id,
+  label,
+  tab,
+  setTab,
+}: {
+  id: TabId;
+  label: string;
+  tab: TabId;
+  setTab: (id: TabId) => void;
+}) {
+  return (
+    <button
+      onClick={() => setTab(id)}
+      className={`rounded-full px-4 py-1.5 text-sm transition-colors ${
+        tab === id
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:text-primary"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function TabDropdown({
+  label,
+  active,
+  options,
+  onSelect,
+}: {
+  label: string;
+  active: TabId;
+  options: { id: TabId; label: string }[];
+  onSelect: (id: TabId) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const isActive = options.some((o) => o.id === active);
+  return (
+    <div className="relative" onMouseLeave={() => setOpen(false)}>
+      <button
+        onClick={() => setOpen((s) => !s)}
+        className={`inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-sm transition-colors ${
+          isActive
+            ? "bg-primary text-primary-foreground"
+            : "text-muted-foreground hover:text-primary"
+        }`}
+      >
+        {label} <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 min-w-48 rounded-2xl border border-border bg-card/95 p-2 shadow-2xl backdrop-blur-xl">
+          {options.map((o) => (
+            <button
+              key={o.id}
+              onClick={() => {
+                onSelect(o.id);
+                setOpen(false);
+              }}
+              className={`w-full rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                active === o.id
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

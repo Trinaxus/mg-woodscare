@@ -7,7 +7,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 
 export function InstagramFeed() {
   const { content } = useContent();
-  const postCount = content.instagram.postCount || 6;
+  const postCount = content.instagram.postCount ?? 6;
 
   const [account, setAccount] = useState<InstagramAccount | null>(null);
   const [posts, setPosts] = useState<InstagramMedia[]>([]);
@@ -24,6 +24,10 @@ export function InstagramFeed() {
   const [showComments, setShowComments] = useState(false);
 
   useEffect(() => {
+    if (postCount === 0) {
+      setLoading(false);
+      return;
+    }
     let mounted = true;
     async function load() {
       try {
@@ -46,6 +50,8 @@ export function InstagramFeed() {
       mounted = false;
     };
   }, [postCount]);
+
+  if (postCount === 0) return null;
 
   const openPost = useCallback(async (post: InstagramMedia) => {
     setSelectedPost(post);
