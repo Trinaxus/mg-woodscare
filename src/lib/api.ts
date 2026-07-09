@@ -48,7 +48,10 @@ export class ApiClient {
       console.log('API Response:', { url, status: response.status, data });
 
       if (!response.ok) {
-        throw new Error(data.error || `HTTP ${response.status}`);
+        const message = typeof data.error === 'string'
+          ? data.error
+          : (data.error?.message || JSON.stringify(data.error || {}));
+        throw new Error(message || `HTTP ${response.status}`);
       }
 
       return data;
