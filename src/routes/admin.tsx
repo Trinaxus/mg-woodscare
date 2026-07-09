@@ -971,7 +971,8 @@ function InstagramTab({
             </p>
             <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
               {posts.map((post) => {
-                const selected = draft.instagram.selectedPostIds.includes(post.id);
+                const orderIndex = draft.instagram.selectedPostIds.indexOf(post.id);
+                const selected = orderIndex !== -1;
                 return (
                   <button
                     key={post.id}
@@ -992,7 +993,7 @@ function InstagramTab({
                     />
                     <div className={`absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                       <div className={`grid h-8 w-8 place-items-center rounded-full border-2 ${selected ? 'border-primary bg-primary text-primary-foreground' : 'border-white bg-white/20 text-white'}`}>
-                        {selected ? '✓' : '+'}
+                        {selected ? orderIndex + 1 : '+'}
                       </div>
                     </div>
                     {post.media_type === "VIDEO" && (
