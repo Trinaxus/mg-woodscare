@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Leaf, BadgeCheck } from "lucide-react";
+import { Leaf, Star } from "lucide-react";
 
 import heroForest from "@/assets/hero-forest.jpg";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
@@ -64,12 +64,10 @@ function ReferenzenPage() {
                   key={index}
                   className="group relative overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-card transition-all hover:scale-[1.02] hover:shadow-lg"
                 >
-                  <div className="absolute -right-10 top-5 rotate-45 bg-primary px-12 py-1 text-center text-xs font-semibold text-primary-foreground shadow-sm">
-                    <span className="inline-flex items-center gap-1">
-                      <BadgeCheck className="h-3 w-3" /> Top
-                    </span>
+                  <div className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full bg-primary shadow-md ring-1 ring-primary/20">
+                    <Star className="h-3.5 w-3.5 fill-primary-foreground text-primary-foreground" />
                   </div>
-                  <h3 className="mt-4 font-display text-xl font-semibold">{item.title}</h3>
+                  <h3 className="mt-2 font-display text-xl font-semibold">{item.title}</h3>
                   <p className="mt-3 text-foreground/75">{item.text}</p>
                 </div>
               ))}
