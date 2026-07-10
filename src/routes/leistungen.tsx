@@ -31,9 +31,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import arboristImg from "@/assets/arborist.jpg";
-import firewoodImg from "@/assets/firewood.jpg";
-import sawmillImg from "@/assets/sawmill.jpg";
+import heroForest from "@/assets/hero-forest.jpg";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ScrollReveal, HeroReveal } from "@/components/ScrollReveal";
@@ -99,7 +97,7 @@ function LeistungenPage() {
         {/* HERO */}
         <section className="relative isolate overflow-hidden pt-24">
           <ParallaxImage
-            src={content.leistungen.image || arboristImg}
+            src={content.leistungen.image || heroForest}
             alt="Baumpfleger bei der Arbeit"
             width={1920}
             height={1280}
