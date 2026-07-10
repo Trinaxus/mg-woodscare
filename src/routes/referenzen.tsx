@@ -32,7 +32,7 @@ function ReferenzenPage() {
         {/* HERO */}
         <section className="relative isolate overflow-hidden pt-24">
           <ParallaxImage
-            src={heroForest}
+            src={content.referenzen.image || heroForest}
             alt="Waldlandschaft"
             width={1920}
             height={1280}

@@ -99,7 +99,7 @@ function LeistungenPage() {
         {/* HERO */}
         <section className="relative isolate overflow-hidden pt-24">
           <ParallaxImage
-            src={arboristImg}
+            src={content.leistungen.image || arboristImg}
             alt="Baumpfleger bei der Arbeit"
             width={1920}
             height={1280}

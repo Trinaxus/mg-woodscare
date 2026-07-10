@@ -29,11 +29,13 @@ export interface SiteContent {
     subtitle: string;
     ctaPrimary: string;
     ctaSecondary: string;
+    image?: string;
   };
   stats: { value: string; label: string }[];
   leistungen: {
     sectionTitle: string;
     sectionText: string;
+    image?: string;
     items: { icon: string; title: string; text: string }[];
   };
   ueberUns: {
@@ -43,14 +45,16 @@ export interface SiteContent {
     badges: string[];
     certLabel: string;
     certSub: string;
+    image?: string;
     team: { name: string; role: string; image?: string; bullets: string[] }[];
   };
   features: {
-    sawmill: { eyebrow: string; title: string; text: string };
-    firewood: { eyebrow: string; title: string; text: string };
+    sawmill: { eyebrow: string; title: string; text: string; image?: string };
+    firewood: { eyebrow: string; title: string; text: string; image?: string };
   };
   referenzen: {
     title: string;
+    image?: string;
     items: { title: string; text: string }[];
   };
   kontakt: {
@@ -62,6 +66,7 @@ export interface SiteContent {
     ownerLine: string;
     processTitle: string;
     processSteps: { number: string; title: string; text: string }[];
+    image?: string;
   };
   instagram: {
     handle: string;

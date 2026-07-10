@@ -68,7 +68,7 @@ function LandingPage() {
       {/* HERO */}
       <section id="top" className="relative isolate overflow-hidden pt-24">
         <ParallaxImage
-          src={heroForest}
+          src={content.hero.image || heroForest}
           alt="Sonnenstrahlen fallen durch einen dichten Nadelwald"
           width={1920}
           height={1280}
@@ -137,7 +137,7 @@ function LandingPage() {
           <ScrollReveal direction="left">
             <div className="relative">
               <img
-                src={arboristImg}
+                src={content.ueberUns.image || arboristImg}
                 alt="Baumkletterer bei der Arbeit hoch oben in einer Kiefer"
                 width={1280}
                 height={960}
@@ -206,10 +206,10 @@ function LandingPage() {
       <section className="mx-auto max-w-7xl px-6 py-28">
         <div className="grid gap-8 md:grid-cols-2">
           <ScrollReveal>
-            <FeatureCard image={sawmillImg} {...content.features.sawmill} />
+            <FeatureCard image={content.features.sawmill.image || sawmillImg} {...content.features.sawmill} />
           </ScrollReveal>
           <ScrollReveal delay={150}>
-            <FeatureCard image={firewoodImg} {...content.features.firewood} />
+            <FeatureCard image={content.features.firewood.image || firewoodImg} {...content.features.firewood} />
           </ScrollReveal>
         </div>
       </section>

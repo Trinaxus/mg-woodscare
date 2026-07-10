@@ -121,6 +121,7 @@ function AdminDashboard() {
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadingTeamIndex, setUploadingTeamIndex] = useState<number | null>(null);
+  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const update = <K extends keyof SiteContent>(key: K, value: SiteContent[K]) => {
@@ -143,6 +144,87 @@ function AdminDashboard() {
       setTimeout(() => setNotice(null), 2500);
     }
   };
+
+  const uploadSectionImage = async (
+    key: keyof SiteContent,
+    section: string,
+    file: File,
+    onSuccess: (url: string) => void
+  ) => {
+    const uploadKey = `${String(key)}.${section}`;
+    setUploadingKey(uploadKey);
+    try {
+      const response = await api.uploadImage(file, "content");
+      onSuccess(response.url);
+      setNotice("Bild hochgeladen.");
+    } catch (error) {
+      setNotice("Fehler beim Hochladen des Bildes.");
+    } finally {
+      setUploadingKey(null);
+      setTimeout(() => setNotice(null), 2500);
+    }
+  };
+
+  function ImageField({
+    label,
+    url,
+    uploading,
+    onUpload,
+    onClear,
+    aspect = "video",
+  }: {
+    label: string;
+    url: string;
+    uploading: boolean;
+    onUpload: (file: File) => void;
+    onClear: () => void;
+    aspect?: "video" | "square";
+  }) {
+    return (
+      <div>
+        <span className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          {label}
+        </span>
+        <div className="flex flex-wrap items-center gap-4">
+          {url ? (
+            <div className={`relative overflow-hidden rounded-2xl border border-border bg-background ${aspect === "square" ? "h-24 w-24" : "h-24 w-40"}`}>
+              <img src={url} alt={label} className="h-full w-full object-cover" />
+            </div>
+          ) : (
+            <div className={`grid place-items-center rounded-2xl border border-dashed border-border bg-muted/40 text-muted-foreground ${aspect === "square" ? "h-24 w-24" : "h-24 w-40"}`}>
+              <span className="text-xs">Kein Bild</span>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-sm font-medium transition-colors hover:bg-card">
+              <Upload className="h-4 w-4" />
+              {uploading ? "Lade..." : "Bild wählen"}
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                disabled={uploading}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) onUpload(file);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+            {url && (
+              <button
+                type="button"
+                onClick={onClear}
+                className="text-sm text-destructive hover:underline"
+              >
+                Entfernen
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const save = async () => {
     setLoading(true);
@@ -291,6 +373,15 @@ function AdminDashboard() {
         {tab === "hero" && (
           <Card title="Startseite">
             <p className="text-sm font-medium">Hero-Bereich</p>
+            <ImageField
+              label="Hero-Hintergrundbild"
+              url={draft.hero.image || ""}
+              uploading={uploadingKey === "hero.image"}
+              onUpload={(file) =>
+                uploadSectionImage("hero", "image", file, (url) => update("hero", { ...draft.hero, image: url }))
+              }
+              onClear={() => update("hero", { ...draft.hero, image: "" })}
+            />
             <TextField label="Eyebrow / kleine Zeile" value={draft.hero.eyebrow} onChange={(v) => update("hero", { ...draft.hero, eyebrow: v })} />
             <TextField label="Titel – Anfang" value={draft.hero.titleLead} onChange={(v) => update("hero", { ...draft.hero, titleLead: v })} />
             <TextField label="Titel – Akzentwort" value={draft.hero.titleAccent} onChange={(v) => update("hero", { ...draft.hero, titleAccent: v })} />
@@ -332,6 +423,15 @@ function AdminDashboard() {
           <Card title="Leistungen">
             <TextField label="Abschnittstitel" value={draft.leistungen.sectionTitle} onChange={(v) => update("leistungen", { ...draft.leistungen, sectionTitle: v })} />
             <TextArea label="Abschnittstext" value={draft.leistungen.sectionText} onChange={(v) => update("leistungen", { ...draft.leistungen, sectionText: v })} />
+            <ImageField
+              label="Hero-Hintergrundbild"
+              url={draft.leistungen.image || ""}
+              uploading={uploadingKey === "leistungen.image"}
+              onUpload={(file) =>
+                uploadSectionImage("leistungen", "image", file, (url) => update("leistungen", { ...draft.leistungen, image: url }))
+              }
+              onClear={() => update("leistungen", { ...draft.leistungen, image: "" })}
+            />
             <div className="mt-6 h-px bg-border" />
             <p className="mt-6 text-sm font-medium">Einzelne Leistungen</p>
             <ListEditor
@@ -387,6 +487,15 @@ function AdminDashboard() {
         {tab === "ueberUns" && (
           <Card title="Über uns & Team">
             <TextField label="Titel" value={draft.ueberUns.title} onChange={(v) => update("ueberUns", { ...draft.ueberUns, title: v })} />
+            <ImageField
+              label="Über-uns Bild"
+              url={draft.ueberUns.image || ""}
+              uploading={uploadingKey === "ueberUns.image"}
+              onUpload={(file) =>
+                uploadSectionImage("ueberUns", "image", file, (url) => update("ueberUns", { ...draft.ueberUns, image: url }))
+              }
+              onClear={() => update("ueberUns", { ...draft.ueberUns, image: "" })}
+            />
             <TextArea label="Einleitung" value={draft.ueberUns.intro} onChange={(v) => update("ueberUns", { ...draft.ueberUns, intro: v })} />
             <TextArea label="Einleitung 2" value={draft.ueberUns.intro2} onChange={(v) => update("ueberUns", { ...draft.ueberUns, intro2: v })} />
             <TextField label="Zertifikat-Label" value={draft.ueberUns.certLabel} onChange={(v) => update("ueberUns", { ...draft.ueberUns, certLabel: v })} />
@@ -464,11 +573,29 @@ function AdminDashboard() {
         {tab === "features" && (
           <Card title="Sägewerk & Brennholz">
             <p className="text-sm font-medium">Sägewerk</p>
+            <ImageField
+              label="Sägewerk Bild"
+              url={draft.features.sawmill.image || ""}
+              uploading={uploadingKey === "features.sawmill.image"}
+              onUpload={(file) =>
+                uploadSectionImage("features", "sawmill.image", file, (url) => update("features", { ...draft.features, sawmill: { ...draft.features.sawmill, image: url } }))
+              }
+              onClear={() => update("features", { ...draft.features, sawmill: { ...draft.features.sawmill, image: "" } })}
+            />
             <TextField label="Eyebrow" value={draft.features.sawmill.eyebrow} onChange={(v) => update("features", { ...draft.features, sawmill: { ...draft.features.sawmill, eyebrow: v } })} />
             <TextField label="Titel" value={draft.features.sawmill.title} onChange={(v) => update("features", { ...draft.features, sawmill: { ...draft.features.sawmill, title: v } })} />
             <TextArea label="Text" value={draft.features.sawmill.text} onChange={(v) => update("features", { ...draft.features, sawmill: { ...draft.features.sawmill, text: v } })} />
             <div className="my-6 h-px bg-border" />
             <p className="text-sm font-medium">Brennholz</p>
+            <ImageField
+              label="Brennholz Bild"
+              url={draft.features.firewood.image || ""}
+              uploading={uploadingKey === "features.firewood.image"}
+              onUpload={(file) =>
+                uploadSectionImage("features", "firewood.image", file, (url) => update("features", { ...draft.features, firewood: { ...draft.features.firewood, image: url } }))
+              }
+              onClear={() => update("features", { ...draft.features, firewood: { ...draft.features.firewood, image: "" } })}
+            />
             <TextField label="Eyebrow" value={draft.features.firewood.eyebrow} onChange={(v) => update("features", { ...draft.features, firewood: { ...draft.features.firewood, eyebrow: v } })} />
             <TextField label="Titel" value={draft.features.firewood.title} onChange={(v) => update("features", { ...draft.features, firewood: { ...draft.features.firewood, title: v } })} />
             <TextArea label="Text" value={draft.features.firewood.text} onChange={(v) => update("features", { ...draft.features, firewood: { ...draft.features.firewood, text: v } })} />
@@ -478,6 +605,15 @@ function AdminDashboard() {
         {tab === "referenzen" && (
           <Card title="Referenzen">
             <TextField label="Titel" value={draft.referenzen.title} onChange={(v) => update("referenzen", { ...draft.referenzen, title: v })} />
+            <ImageField
+              label="Hero-Hintergrundbild"
+              url={draft.referenzen.image || ""}
+              uploading={uploadingKey === "referenzen.image"}
+              onUpload={(file) =>
+                uploadSectionImage("referenzen", "image", file, (url) => update("referenzen", { ...draft.referenzen, image: url }))
+              }
+              onClear={() => update("referenzen", { ...draft.referenzen, image: "" })}
+            />
             <ListEditor
               items={draft.referenzen.items}
               onChange={(items) => update("referenzen", { ...draft.referenzen, items })}
@@ -495,6 +631,15 @@ function AdminDashboard() {
         {tab === "kontakt" && (
           <Card title="Kontakt">
             <TextField label="Titel" value={draft.kontakt.title} onChange={(v) => update("kontakt", { ...draft.kontakt, title: v })} />
+            <ImageField
+              label="Hero-Hintergrundbild"
+              url={draft.kontakt.image || ""}
+              uploading={uploadingKey === "kontakt.image"}
+              onUpload={(file) =>
+                uploadSectionImage("kontakt", "image", file, (url) => update("kontakt", { ...draft.kontakt, image: url }))
+              }
+              onClear={() => update("kontakt", { ...draft.kontakt, image: "" })}
+            />
             <TextArea label="Einleitungstext" value={draft.kontakt.text} onChange={(v) => update("kontakt", { ...draft.kontakt, text: v })} />
             <TextField label="Telefon" value={draft.kontakt.phone} onChange={(v) => update("kontakt", { ...draft.kontakt, phone: v })} />
             <TextField label="E-Mail" value={draft.kontakt.email} onChange={(v) => update("kontakt", { ...draft.kontakt, email: v })} />
