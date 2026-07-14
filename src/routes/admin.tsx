@@ -180,6 +180,11 @@ function AdminDashboard() {
     onClear: () => void;
     aspect?: "video" | "square";
   }) {
+    // Thumbnail-URL ableiten: /upload/ -> /upload/previews/
+    const thumbnailUrl = url
+      ? url.replace('/server/upload/', '/server/upload/previews/')
+      : '';
+    
     return (
       <div>
         <span className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
@@ -188,7 +193,7 @@ function AdminDashboard() {
         <div className="flex flex-wrap items-center gap-4">
           {url ? (
             <div className={`relative overflow-hidden rounded-2xl border border-border bg-background ${aspect === "square" ? "h-24 w-24" : "h-24 w-40"}`}>
-              <img src={url} alt={label} className="h-full w-full object-cover" />
+              <img src={thumbnailUrl || url} alt={label} className="h-full w-full object-cover" />
             </div>
           ) : (
             <div className={`grid place-items-center rounded-2xl border border-dashed border-border bg-muted/40 text-muted-foreground ${aspect === "square" ? "h-24 w-24" : "h-24 w-40"}`}>

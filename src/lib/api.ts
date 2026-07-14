@@ -15,7 +15,9 @@ export interface UploadResponse {
   success: boolean;
   message: string;
   url: string;
+  thumbnailUrl?: string;
   filename: string;
+  thumbnailFilename?: string;
   size: number;
   type: string;
 }

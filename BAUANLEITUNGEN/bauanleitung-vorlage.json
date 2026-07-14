@@ -1,0 +1,446 @@
+{
+  "schema_version": "1.0",
+  "template_name": "Website mit TanStack Start + Admin-Panel",
+  "description": "Vorlage für SEO-optimierte Handwerks- und Dienstleistungswebsites mit Content-Management und dynamischer Bildverwaltung. Basierend auf PROJEKT-01 (MG Woodscare).",
+  "project": {
+    "id": "PROJEKT-XX",
+    "name": "[Projektname eintragen]",
+    "type": "Website mit Admin-Panel",
+    "description": "[Kurzbeschreibung eintragen]",
+    "customer": "[Kundenname eintragen]",
+    "frontend_url": "[Vercel-URL eintragen]",
+    "backend_url": "[PHP-Backend-URL eintragen]",
+    "repository": "[GitHub-URL eintragen]",
+    "branch": "main"
+  },
+  "technology_stack": {
+    "frontend_framework": "TanStack Start (React)",
+    "ui_library": "React 18+",
+    "routing": "TanStack Router (file-based)",
+    "build_tool": "Vite 8.x",
+    "rendering": "SSR + Static Prerendering",
+    "styling": "Tailwind CSS",
+    "components": "shadcn/ui (Basis) + eigene Komponenten",
+    "icons": "Lucide React",
+    "language": "TypeScript",
+    "state_management": "React Context (ContentProvider)",
+    "hosting_frontend": "Vercel",
+    "hosting_backend": "All-Inkl (PHP) oder eigener Server"
+  },
+  "build_and_deployment": {
+    "install_command": "npm install",
+    "build_command": "npm run build",
+    "build_directory": "dist",
+    "prerender": true,
+    "important_note": "Build-Befehl muss im Projektverzeichnis ausgeführt werden.",
+    "deployment": {
+      "frontend": "Vercel (automatisches Deployment via GitHub)",
+      "backend": "PHP-Dateien auf Kunden-Server"
+    }
+  },
+  "project_structure": {
+    "directories": [
+      {
+        "path": "src/routes",
+        "purpose": "Alle Seiten (file-based routing)"
+      },
+      {
+        "path": "src/components",
+        "purpose": "Wiederverwendbare UI-Komponenten"
+      },
+      {
+        "path": "src/data",
+        "purpose": "Content-Schema und Defaults"
+      },
+      {
+        "path": "src/lib",
+        "purpose": "API-Client, Content-Provider, Utilities"
+      },
+      {
+        "path": "src/assets",
+        "purpose": "Statische Fallback-Bilder und Logos"
+      },
+      {
+        "path": "public",
+        "purpose": "Statische Dateien"
+      },
+      {
+        "path": "server",
+        "purpose": "PHP-Backend (außerhalb von src)"
+      }
+    ],
+    "key_files": [
+      "src/routes/__root.tsx",
+      "src/routes/index.tsx",
+      "src/data/defaultContent.ts",
+      "src/lib/content.tsx",
+      "src/lib/api.ts",
+      "src/components/SiteChrome.tsx",
+      "vite.config.ts",
+      "vercel.json",
+      "package.json",
+      "README.md"
+    ]
+  },
+  "standard_routes": [
+    {
+      "path": "/",
+      "file": "src/routes/index.tsx",
+      "purpose": "Startseite",
+      "required": true
+    },
+    {
+      "path": "/[leistungen]",
+      "file": "src/routes/leistungen.tsx",
+      "purpose": "Leistungsübersicht",
+      "required": false
+    },
+    {
+      "path": "/[referenzen]",
+      "file": "src/routes/referenzen.tsx",
+      "purpose": "Referenzen / Kunden",
+      "required": false
+    },
+    {
+      "path": "/[kontakt]",
+      "file": "src/routes/kontakt.tsx",
+      "purpose": "Kontaktseite",
+      "required": false
+    },
+    {
+      "path": "/impressum",
+      "file": "src/routes/impressum.tsx",
+      "purpose": "Impressum (noindex)",
+      "required": true
+    },
+    {
+      "path": "/datenschutz",
+      "file": "src/routes/datenschutz.tsx",
+      "purpose": "Datenschutz (noindex)",
+      "required": true
+    },
+    {
+      "path": "/admin",
+      "file": "src/routes/admin.tsx",
+      "purpose": "Admin-Panel für Content-Verwaltung",
+      "required": true
+    }
+  ],
+  "content_schema_template": {
+    "source": "src/data/defaultContent.ts",
+    "description": "Zentrales Content-Objekt mit Defaults. Jede Sektion kann über das Admin-Panel editiert werden.",
+    "required_sections": [
+      "brand",
+      "seo",
+      "hero",
+      "footer"
+    ],
+    "optional_sections": [
+      "stats",
+      "leistungen",
+      "ueberUns",
+      "features",
+      "referenzen",
+      "kontakt",
+      "social",
+      "instagram",
+      "reviews"
+    ],
+    "image_fields_per_section": {
+      "hero": "image",
+      "ueberUns": "image",
+      "features.sawmill": "image",
+      "features.firewood": "image",
+      "leistungen": "image",
+      "referenzen": "image",
+      "kontakt": "image"
+    }
+  },
+  "api_template": {
+    "client_file": "src/lib/api.ts",
+    "base_url": "[Backend-URL]/API/",
+    "required_endpoints": [
+      {
+        "name": "getContent",
+        "method": "GET",
+        "url": "get-content.php",
+        "purpose": "Lädt gespeicherten Content vom Server"
+      },
+      {
+        "name": "saveContent",
+        "method": "POST",
+        "url": "save-content.php",
+        "purpose": "Speichert Content auf dem Server"
+      },
+      {
+        "name": "uploadImage",
+        "method": "POST",
+        "url": "upload.php",
+        "purpose": "Bild-Upload zu einem bestimmten Ordner"
+      },
+      {
+        "name": "login",
+        "method": "POST",
+        "url": "login.php",
+        "purpose": "Admin-Login"
+      }
+    ]
+  },
+  "image_handling_template": {
+    "description": "Bilder werden über das Admin-Panel hochgeladen. Backend skaliert automatisch auf max. 1920px und erzeugt Thumbnails (max. 400px). Frontend nutzt dynamische URL mit Fallback auf statische Assets.",
+    "upload_target": "Server-Ordner via upload.php",
+    "server_base_url": "[Backend-URL]/upload/",
+    "thumbnail_base_url": "[Backend-URL]/upload/previews/",
+    "thumbnail_generation": {
+      "max_original_size": "1920x1920px",
+      "max_thumbnail_size": "400x400px",
+      "thumbnail_folder": "upload/previews/",
+      "naming": "Gleicher Dateiname wie Original, nur in anderem Ordner"
+    },
+    "fallback_assets_directory": "src/assets/",
+    "example_usage": "content.hero.image || heroForest",
+    "admin_preview": "Admin-Panel zeigt automatisch Thumbnail-Vorschau an"
+  },
+  "components_template": {
+    "required": [
+      "SiteChrome.tsx",
+      "SiteHeader.tsx",
+      "SiteFooter.tsx",
+      "ParallaxImage.tsx",
+      "ScrollReveal.tsx",
+      "HeroReveal.tsx",
+      "BackgroundPattern.tsx",
+      "ScrollToTop.tsx"
+    ],
+    "admin_components": [
+      "LoginScreen",
+      "AdminDashboard",
+      "ImageField",
+      "TextField",
+      "TextArea",
+      "ListEditor",
+      "IconPicker",
+      "TabButton",
+      "TabDropdown"
+    ]
+  },
+  "seo_template": {
+    "meta_tags_per_route": true,
+    "json_ld": "SiteChrome.tsx (Organization, optional LocalBusiness)",
+    "security_headers_file": "vercel.json",
+    "required_meta_tags": [
+      "title",
+      "description",
+      "keywords",
+      "og:title",
+      "og:description",
+      "og:image",
+      "twitter:card"
+    ],
+    "important_files": [
+      "src/routes/__root.tsx",
+      "src/routes/index.tsx",
+      "src/routes/impressum.tsx",
+      "src/routes/datenschutz.tsx"
+    ]
+  },
+  "design_system_template": {
+    "framework": "Tailwind CSS",
+    "custom_classes": [
+      "bg-gradient-forest",
+      "shadow-card",
+      "shadow-glow",
+      "font-display"
+    ],
+    "primary_color": "[Hauptfarbe definieren]",
+    "card_style": "rounded-3xl border border-border bg-card p-8 shadow-card",
+    "button_style": "rounded-full bg-primary text-primary-foreground"
+  },
+  "build_steps_for_new_project": [
+    "1. PROJEKT-01-Vorlage kopieren und in PROJEKT-XX umbenennen",
+    "2. package.json anpassen (Name, Beschreibung, Repo)",
+    "3. Projekt-Metadaten in defaultContent.ts eintragen",
+    "4. Farben und Design-Tokens in Tailwind-Konfiguration anpassen",
+    "5. Backend-URL in src/lib/api.ts eintragen",
+    "6. Standard-Routen erstellen (Startseite, Impressum, Datenschutz, Admin)",
+    "7. Content-Schema für Kundenbedarf erweitern",
+    "8. Admin-Panel Tabs für alle Content-Sektionen einrichten",
+    "9. ImageField für alle Bildbereiche hinzufügen",
+    "10. SEO Meta-Tags für alle öffentlichen Routen definieren",
+    "11. JSON-LD in SiteChrome.tsx anpassen",
+    "12. vercel.json mit richtiger CSP und Backend-Domain anpassen",
+    "13. README.md und BAUANLEITUNGEN/ aktualisieren",
+    "14. Deployment auf Vercel einrichten",
+    "15. PHP-Backend auf Kunden-Server bereitstellen",
+    "16. Build testen und deployen"
+  ],
+  "skill": {
+    "description": "Wiederverwendbarer Workflow für neue Projekte. Bevor Code geschrieben wird, wird ein kurzes Interview geführt.",
+    "interview_questions": [
+      {
+        "id": "project_name",
+        "question": "Wie heißt das neue Projekt?",
+        "type": "text",
+        "required": true
+      },
+      {
+        "id": "customer",
+        "question": "Wer ist der Kunde?",
+        "type": "text",
+        "required": true
+      },
+      {
+        "id": "industry",
+        "question": "Welche Branche?",
+        "type": "text",
+        "required": true
+      },
+      {
+        "id": "domain",
+        "question": "Soll eine eigene Domain genutzt werden?",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "database",
+        "question": "Datenbanklos (JSON via PHP-API) oder mit Datenbank?",
+        "type": "choice",
+        "options": ["json-api", "database"],
+        "default": "json-api",
+        "recommended": "json-api"
+      },
+      {
+        "id": "hosting_frontend",
+        "question": "Wo soll das Frontend gehostet werden?",
+        "type": "choice",
+        "options": ["Vercel", "Netlify", "eigener Server"],
+        "default": "Vercel"
+      },
+      {
+        "id": "hosting_backend",
+        "question": "Wo soll das PHP-Backend gehostet werden?",
+        "type": "choice",
+        "options": ["All-Inkl", "Strato", "eigener Server"],
+        "default": "All-Inkl"
+      },
+      {
+        "id": "pages",
+        "question": "Welche Seiten sollen entstehen?",
+        "type": "multiselect",
+        "options": [
+          "Startseite",
+          "Leistungen",
+          "Referenzen",
+          "Kontakt",
+          "Über uns",
+          "Blog",
+          "Galerie",
+          "Impressum",
+          "Datenschutz",
+          "Admin"
+        ],
+        "required": ["Startseite", "Impressum", "Datenschutz", "Admin"]
+      },
+      {
+        "id": "features",
+        "question": "Zusätzliche Features?",
+        "type": "multiselect",
+        "options": [
+          "Google-Bewertungen / Kundenbewertungen",
+          "Instagram-Feed",
+          "Kontaktformular",
+          "Blog/News",
+          "Mehrsprachigkeit"
+        ]
+      },
+      {
+        "id": "design_colors",
+        "question": "Gibt es Farb- oder Design-Vorgaben?",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "repo-url",
+        "question": "GitHub-Repository-URL",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "github-source",
+        "question": "Ursprung des Codes",
+        "type": "choice",
+        "options": ["lovable", "manual"],
+        "default": "lovable"
+      },
+      {
+        "id": "github-branch",
+        "question": "Branch für Push",
+        "type": "text",
+        "default": "main"
+      },
+      {
+        "id": "github-remote",
+        "question": "GitHub Remote-Name",
+        "type": "text",
+        "default": "origin"
+      }
+    ]
+  },
+  "github_workflow": {
+    "description": "Wenn das Projekt aus Lovable kommt, ist das GitHub-Repo bereits vorhanden. Das lokale Projekt muss mit diesem Repo verbunden und auf main gepusht werden.",
+    "required_branch": "main",
+    "steps": [
+      "GitHub-Repository-URL notieren",
+      "git init (falls noch nicht initialisiert)",
+      "git remote add origin [REPO-URL]",
+      "git branch -M main",
+      "git add .",
+      "git commit -m 'Initialer Commit'",
+      "git push -u origin main",
+      "Vercel mit GitHub-Repo verbinden"
+    ]
+  },
+  "architecture_options": {
+    "databaseless_json_api": {
+      "description": "Content wird als JSON-Datei auf dem Server gespeichert und via PHP-API geladen/gespeichert.",
+      "recommended_for": "Handwerks- und Dienstleistungswebsites mit überschaubarem Content",
+      "backend_structure": {
+        "server/API/get-content.php": "Lädt content.json",
+        "server/API/save-content.php": "Speichert content.json",
+        "server/API/upload.php": "Bild-Upload",
+        "server/API/login.php": "Admin-Login",
+        "server/data/content.json": "Gespeicherter Content",
+        "server/Upload/content/": "Hochgeladene Bilder"
+      }
+    },
+    "with_database": {
+      "description": "Content wird in einer Datenbank (z. B. MySQL, SQLite) gespeichert.",
+      "when_to_use": "Große Datenmengen, Mehrbenutzer-Systeme, komplexe Beziehungen",
+      "note": "Diese Option erfordert zusätzliche Planung und ist nicht Standard für diese Vorlage."
+    }
+  },
+  "cleanup_rules": {
+    "description": "Vor dem ersten Build müssen Lovable-/Demo-Reste und projektfremde Dateien entfernt werden.",
+    "steps": [
+      "README.md aus Lovable ersetzen durch eigene README",
+      "Lovable-Branding entfernen (falls vorhanden)",
+      "Favicon ersetzen (public/favicon.ico, apple-touch-icon.png, etc.)",
+      "Demo-Komponenten und Demo-Seiten entfernen",
+      "package.json bereinigen (nicht genutzte Dependencies entfernen)",
+      ".env-Dateien prüfen und Secrets entfernen",
+      "dist/ und node_modules/ löschen (werden neu generiert)",
+      "vercel.json auf neue Domain/Backend anpassen"
+    ]
+  },
+  "rules": [
+    "Build-Befehl muss immer im Projektverzeichnis ausgeführt werden.",
+    "Bilder, die über das Admin-Panel hochgeladen werden, landen auf dem Server, nicht in Git.",
+    "Assets in src/assets/ sind statische Fallback-Bilder.",
+    "Neue Features erweitern zuerst das Content-Schema, dann das Admin-Panel, dann das Frontend.",
+    "Jede öffentliche Route sollte eigene Meta-Tags in head() definieren.",
+    "Impressum und Datenschutz erhalten robots: noindex,follow.",
+    "HANDOUT.md und BAUANLEITUNGEN/ bei jeder Sitzung aktualisieren.",
+    "Vor dem ersten Build immer Cleanup durchführen.",
+    "Standard-Architektur: Datenbanklos via JSON-API auf PHP-Backend."
+  ]
+}

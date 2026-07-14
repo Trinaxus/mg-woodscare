@@ -1,0 +1,286 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "id": "PROJEKT-01",
+    "name": "MG Woodscare",
+    "type": "Website mit Admin-Panel",
+    "description": "Baumpflege & Sägewerk Leipzig – öffentliche Webseite mit SEO, Content-Management und dynamischer Bildverwaltung.",
+    "customer": "MG Woodscare",
+    "frontend_url": "https://mg-woodscare.vercel.app",
+    "backend_url": "https://tubox.de/mg_woodscare/server/",
+    "repository": "github.com/Trinaxus/mg-woodscare",
+    "branch": "main",
+    "github_source": "manual",
+    "github_remote": "origin"
+  },
+  "github_workflow": {
+    "description": "Projekt wird manuell auf GitHub gepflegt. Alle Änderungen müssen auf den main-Branch gepusht werden.",
+    "required_branch": "main",
+    "steps": [
+      "Änderungen lokal testen (npm run build)",
+      "git add .",
+      "git commit -m 'Beschreibende Nachricht'",
+      "git push origin main"
+    ]
+  },
+  "technology_stack": {
+    "frontend_framework": "TanStack Start (React)",
+    "ui_library": "React 18+",
+    "routing": "TanStack Router (file-based)",
+    "build_tool": "Vite 8.x",
+    "rendering": "SSR + Static Prerendering",
+    "styling": "Tailwind CSS",
+    "components": "shadcn/ui (Basis) + eigene Komponenten",
+    "icons": "Lucide React",
+    "language": "TypeScript",
+    "state_management": "React Context (ContentProvider)",
+    "hosting_frontend": "Vercel",
+    "hosting_backend": "All-Inkl (PHP)"
+  },
+  "build_and_deployment": {
+    "install_command": "npm install",
+    "build_command": "npm run build",
+    "build_directory": "dist",
+    "prerender": true,
+    "important_note": "Build-Befehl muss im Projektverzeichnis ausgeführt werden: /Volumes/INTERNAL-SSD/PROJECTE/2026/mg-woodscare-main",
+    "deployment": {
+      "frontend": "Vercel (automatisches Deployment via GitHub)",
+      "backend": "PHP-Dateien auf All-Inkl Server"
+    }
+  },
+  "project_structure": {
+    "root": "/Volumes/INTERNAL-SSD/PROJECTE/2026/mg-woodscare-main",
+    "directories": [
+      {
+        "path": "src/routes",
+        "purpose": "Alle Seiten (file-based routing)"
+      },
+      {
+        "path": "src/components",
+        "purpose": "Wiederverwendbare UI-Komponenten"
+      },
+      {
+        "path": "src/data",
+        "purpose": "Content-Schema und Defaults"
+      },
+      {
+        "path": "src/lib",
+        "purpose": "API-Client, Content-Provider, Utilities"
+      },
+      {
+        "path": "src/assets",
+        "purpose": "Statische Fallback-Bilder und Logos"
+      },
+      {
+        "path": "public",
+        "purpose": "Statische Dateien"
+      },
+      {
+        "path": "server",
+        "purpose": "PHP-Backend (außerhalb von src)"
+      }
+    ],
+    "key_files": [
+      "src/routes/__root.tsx",
+      "src/routes/index.tsx",
+      "src/routes/leistungen.tsx",
+      "src/routes/referenzen.tsx",
+      "src/routes/kontakt.tsx",
+      "src/routes/admin.tsx",
+      "src/routes/impressum.tsx",
+      "src/routes/datenschutz.tsx",
+      "src/data/defaultContent.ts",
+      "src/lib/content.tsx",
+      "src/lib/api.ts",
+      "src/components/SiteChrome.tsx",
+      "vite.config.ts",
+      "vercel.json",
+      "package.json"
+    ]
+  },
+  "routes": [
+    {
+      "path": "/",
+      "file": "src/routes/index.tsx",
+      "purpose": "Startseite mit Hero, Über uns, Features, CTA"
+    },
+    {
+      "path": "/leistungen",
+      "file": "src/routes/leistungen.tsx",
+      "purpose": "Leistungsübersicht"
+    },
+    {
+      "path": "/referenzen",
+      "file": "src/routes/referenzen.tsx",
+      "purpose": "Referenzen mit Karten"
+    },
+    {
+      "path": "/kontakt",
+      "file": "src/routes/kontakt.tsx",
+      "purpose": "Kontaktseite"
+    },
+    {
+      "path": "/impressum",
+      "file": "src/routes/impressum.tsx",
+      "purpose": "Impressum (noindex)"
+    },
+    {
+      "path": "/datenschutz",
+      "file": "src/routes/datenschutz.tsx",
+      "purpose": "Datenschutz (noindex)"
+    },
+    {
+      "path": "/admin",
+      "file": "src/routes/admin.tsx",
+      "purpose": "Admin-Panel für Content-Verwaltung"
+    }
+  ],
+  "content_schema": {
+    "source": "src/data/defaultContent.ts",
+    "description": "Zentrales Content-Objekt mit Defaults. Admin-Panel editiert einen Draft, der via API gespeichert wird.",
+    "top_level_sections": [
+      "brand",
+      "seo",
+      "hero",
+      "stats",
+      "leistungen",
+      "ueberUns",
+      "features",
+      "referenzen",
+      "kontakt",
+      "social",
+      "footer",
+      "instagram"
+    ],
+    "image_fields": {
+      "hero": "image",
+      "ueberUns": "image",
+      "features.sawmill": "image",
+      "features.firewood": "image",
+      "leistungen": "image",
+      "referenzen": "image",
+      "kontakt": "image"
+    }
+  },
+  "api": {
+    "client_file": "src/lib/api.ts",
+    "base_url": "https://tubox.de/mg_woodscare/server/API/",
+    "endpoints": [
+      {
+        "name": "getContent",
+        "method": "GET",
+        "url": "get-content.php",
+        "purpose": "Lädt gespeicherten Content vom Server"
+      },
+      {
+        "name": "saveContent",
+        "method": "POST",
+        "url": "save-content.php",
+        "purpose": "Speichert Content auf dem Server"
+      },
+      {
+        "name": "uploadImage",
+        "method": "POST",
+        "url": "upload.php",
+        "purpose": "Bild-Upload zu einem bestimmten Ordner"
+      },
+      {
+        "name": "login",
+        "method": "POST",
+        "url": "login.php",
+        "purpose": "Admin-Login"
+      }
+    ]
+  },
+  "image_handling": {
+    "description": "Bilder können über das Admin-Panel hochgeladen werden. Backend skaliert automatisch auf max. 1920px und erzeugt Thumbnails (max. 400px) im Ordner upload/previews/. Frontend nutzt dynamische URL mit Fallback auf statische Assets.",
+    "upload_target": "Server-Ordner via upload.php",
+    "server_base_url": "https://tubox.de/mg_woodscare/server/upload/",
+    "thumbnail_base_url": "https://tubox.de/mg_woodscare/server/upload/previews/",
+    "thumbnail_generation": {
+      "max_original_size": "1920x1920px",
+      "max_thumbnail_size": "400x400px",
+      "thumbnail_folder": "upload/previews/",
+      "naming": "Gleicher Dateiname wie Original, nur in anderem Ordner"
+    },
+    "fallback_assets_directory": "src/assets/",
+    "example_usage": "content.hero.image || heroForest",
+    "admin_preview": "Admin-Panel zeigt automatisch Thumbnail-Vorschau an"
+  },
+  "components": {
+    "custom": [
+      "SiteChrome.tsx",
+      "SiteHeader.tsx",
+      "SiteFooter.tsx",
+      "ParallaxImage.tsx",
+      "ScrollReveal.tsx",
+      "HeroReveal.tsx",
+      "BackgroundPattern.tsx",
+      "ScrollToTop.tsx"
+    ],
+    "admin_components": [
+      "LoginScreen",
+      "AdminDashboard",
+      "ImageField",
+      "TextField",
+      "TextArea",
+      "ListEditor",
+      "IconPicker",
+      "TabButton",
+      "TabDropdown"
+    ]
+  },
+  "seo": {
+    "meta_tags_per_route": true,
+    "json_ld": "SiteChrome.tsx (Organization, LocalBusiness)",
+    "security_headers_file": "vercel.json",
+    "csp_img_src": ["'self'", "data:", "https://tubox.de", "https://*.instagram.com", "https://*.fbcdn.net", "https://*.cdninstagram.com"],
+    "important_files": [
+      "src/routes/__root.tsx",
+      "src/routes/index.tsx",
+      "src/routes/leistungen.tsx",
+      "src/routes/referenzen.tsx",
+      "src/routes/kontakt.tsx",
+      "src/routes/impressum.tsx",
+      "src/routes/datenschutz.tsx"
+    ]
+  },
+  "design_system": {
+    "framework": "Tailwind CSS",
+    "custom_classes": [
+      "bg-gradient-forest",
+      "shadow-card",
+      "shadow-glow",
+      "font-display"
+    ],
+    "primary_color": "Grün-Ton (Tailwind primary)",
+    "card_style": "rounded-3xl border border-border bg-card p-8 shadow-card",
+    "button_style": "rounded-full bg-primary text-primary-foreground"
+  },
+  "build_steps_for_rebuild": [
+    "1. Projektordner erstellen und npm initialisieren",
+    "2. TanStack Start + React + Vite + TypeScript installieren",
+    "3. Tailwind CSS und shadcn/ui einrichten",
+    "4. File-based Routing konfigurieren",
+    "5. Prerendering in vite.config.ts aktivieren",
+    "6. Projektstruktur aus src/routes, src/components, src/data, src/lib anlegen",
+    "7. Content-Schema in src/data/defaultContent.ts definieren",
+    "8. API-Client in src/lib/api.ts implementieren",
+    "9. ContentProvider in src/lib/content.tsx implementieren",
+    "10. Root-Layout und alle Routen erstellen",
+    "11. Admin-Panel mit Login und Content-Editoren erstellen",
+    "12. ImageField für Uploads mit Vorschau implementieren",
+    "13. SEO Meta-Tags pro Route definieren",
+    "14. JSON-LD in SiteChrome.tsx einbauen",
+    "15. vercel.json mit Security-Headern erstellen",
+    "16. Deployment auf Vercel einrichten",
+    "17. PHP-Backend auf Kunden-Server bereitstellen",
+    "18. Build testen und deployen"
+  ],
+  "notes": [
+    "Build-Befehl muss im Projektverzeichnis ausgeführt werden.",
+    "Bilder, die über Admin-Panel hochgeladen werden, landen auf dem Server, nicht in Git.",
+    "Assets in src/assets/ sind statische Fallback-Bilder.",
+    "Neue Features erweitern zuerst das Content-Schema, dann das Admin-Panel, dann das Frontend."
+  ]
+}

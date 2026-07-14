@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJEKT-01 Bau-Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f0f10;
+      --surface: #18181b;
+      --surface-hover: #27272a;
+      --border: #27272a;
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --primary: #22c55e;
+      --primary-dark: #16a34a;
+      --danger: #ef4444;
+      --radius: 12px;
+      --shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin: 0 0 8px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .progress-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.4s ease;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card h3 {
+      margin-top: 24px;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .grid-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .checkbox-item:hover {
+      background: var(--surface-hover);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--primary);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .checkbox-item.checked {
+      opacity: 0.65;
+    }
+
+    .checkbox-item.checked span {
+      text-decoration: line-through;
+    }
+
+    .checkbox-item span {
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #000;
+    }
+
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-open { background: #3f3f46; color: var(--text); }
+    .status-done { background: var(--primary-dark); color: #fff; }
+
+    .footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 40px;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>PROJEKT-01 Bau-Dashboard</h1>
+      <p>Interaktive Checkliste für den Aufbau neuer Projekte nach MG-Woodscare-Vorlage</p>
+    </header>
+
+    <div class="progress-card">
+      <div class="progress-top">
+        <strong>Gesamtfortschritt</strong>
+        <span id="progress-text">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <span>🎯</span> Phase 1: Projekt-Interview
+      </h2>
+      <div class="grid-2">
+        <div>
+          <label for="project-name">Projektname</label>
+          <input type="text" id="project-name" data-save placeholder="z. B. PROJEKT-02">
+        </div>
+        <div>
+          <label for="customer">Kunde</label>
+          <input type="text" id="customer" data-save placeholder="Firmenname">
+        </div>
+        <div>
+          <label for="industry">Branche</label>
+          <input type="text" id="industry" data-save placeholder="z. B. Baumpflege">
+        </div>
+        <div>
+          <label for="domain">Eigene Domain</label>
+          <input type="text" id="domain" data-save placeholder="z. B. beispiel.de">
+        </div>
+      </div>
+
+      <label for="frontend-hosting">Frontend-Hosting</label>
+      <select id="frontend-hosting" data-save>
+        <option value="Vercel">Vercel</option>
+        <option value="Netlify">Netlify</option>
+        <option value="eigener Server">Eigener Server</option>
+      </select>
+
+      <label for="backend-hosting">Backend-Hosting</label>
+      <select id="backend-hosting" data-save>
+        <option value="All-Inkl">All-Inkl</option>
+        <option value="Strato">Strato</option>
+        <option value="eigener Server">Eigener Server</option>
+      </select>
+
+      <label for="database">Datenhaltung</label>
+      <select id="database" data-save onchange="toggleDatabaseFields()">
+        <option value="json-api">Datenbanklos (JSON via PHP-API)</option>
+        <option value="database">Mit Datenbank</option>
+      </select>
+
+      <div id="database-fields" class="hidden">
+        <div class="grid-2">
+          <div>
+            <label for="db-type">Datenbank-Typ</label>
+            <select id="db-type" data-save>
+              <option value="mysql">MySQL</option>
+              <option value="sqlite">SQLite</option>
+              <option value="postgresql">PostgreSQL</option>
+            </select>
+          </div>
+          <div>
+            <label for="db-host">Datenbank-Host</label>
+            <input type="text" id="db-host" data-save placeholder="z. B. localhost">
+          </div>
+          <div>
+            <label for="db-name">Datenbank-Name</label>
+            <input type="text" id="db-name" data-save placeholder="z. B. projekt_db">
+          </div>
+          <div>
+            <label for="db-user">Datenbank-User</label>
+            <input type="text" id="db-user" data-save placeholder="z. B. projekt_user">
+          </div>
+        </div>
+        <label for="db-password">Datenbank-Passwort</label>
+        <input type="text" id="db-password" data-save placeholder="Passwort">
+      </div>
+
+      <label for="backend-url">Backend-URL</label>
+      <input type="url" id="backend-url" data-save placeholder="https://domain.de/projekt/server/">
+
+      <label for="repo-url">Repository-URL</label>
+      <input type="url" id="repo-url" data-save placeholder="https://github.com/...">
+
+      <label for="github-source">Ursprung des Codes</label>
+      <select id="github-source" data-save>
+        <option value="lovable">Mit Lovable erstellt (GitHub-Repo vorhanden)</option>
+        <option value="manual">Manuell / Vorlage kopiert</option>
+      </select>
+
+      <label for="github-branch">Branch für Push</label>
+      <input type="text" id="github-branch" data-save value="main" placeholder="z. B. main">
+
+      <label for="github-remote">GitHub Remote-Name</label>
+      <input type="text" id="github-remote" data-save value="origin" placeholder="z. B. origin">
+    </div>
+
+    <div class="card">
+      <h2>
+        <span>🛠️</span> Phase 2: Projekt-Setup
+      </h2>
+
+      <h3>Cleanup</h3>
+      <div class="checklist" data-group="cleanup">
+        <div class="checkbox-item"><input type="checkbox" id="c1"><span for="c1">README.md aus Lovable/Demo ersetzen</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="c2"><span for="c2">Lovable-Branding entfernt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="c3"><span for="c3">Favicon ersetzt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="c4"><span for="c4">Demo-Komponenten/Seiten entfernt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="c5"><span for="c5">package.json bereinigt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="c6"><span for="c6">.env-Dateien geprüft, keine Secrets</span></div>
+      </div>
+
+      <h3>GitHub-Integration</h3>
+      <div class="checklist" data-group="github">
+        <div class="checkbox-item"><input type="checkbox" id="g1"><span for="g1">GitHub-Repository-URL bekannt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="g2"><span for="g2">Lokales Projekt mit GitHub-Remote verbunden (git remote add origin ...)</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="g3"><span for="g3">Branch ist <code>main</code></span></div>
+        <div class="checkbox-item"><input type="checkbox" id="g4"><span for="g4">Initialer Commit oder Push auf main erfolgt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="g5"><span for="g5">Vercel/Deployment ist mit GitHub-Repo verbunden</span></div>
+      </div>
+
+      <h3>Metadaten</h3>
+      <div class="checklist" data-group="metadata">
+        <div class="checkbox-item"><input type="checkbox" id="m1"><span for="m1">package.json angepasst</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="m2"><span for="m2">README.md erstellt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="m3"><span for="m3">vite.config.ts geprüft</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="m4"><span for="m4">defaultContent.ts mit Kundencontent befüllt</span></div>
+      </div>
+
+      <h3>Design</h3>
+      <div class="checklist" data-group="design">
+        <div class="checkbox-item"><input type="checkbox" id="d1"><span for="d1">Tailwind-Farben angepasst</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="d2"><span for="d2">Logo und Favicon eingefügt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="d3"><span for="d3">Fonts angepasst</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <span>🗄️</span> Phase 3: Backend einrichten
+      </h2>
+
+      <label for="server-path">Server-Pfad (lokal oder remote)</label>
+      <input type="text" id="server-path" data-save placeholder="z. B. /var/www/html/projekt/server/">
+
+      <div class="checklist" data-group="backend">
+        <div class="checkbox-item"><input type="checkbox" id="b1"><span for="b1">Ordner server/api/ angelegt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="b2"><span for="b2">PHP-Endpunkte kopiert und angepasst</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="b3"><span for="b3">server/upload/content/ beschreibbar</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="b4"><span for="b4">server/upload/previews/ beschreibbar</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="b5"><span for="b5">upload.php geprüft (5 MB, 1920px, 400px Thumbnail)</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="b6"><span for="b6">content.json mit Defaults befüllt (nur bei JSON-API)</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="b7"><span for="b7">Admin-Passwort gesetzt (Hash)</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="b8"><span for="b8">Backend-URL in src/lib/api.ts eingetragen</span></div>
+      </div>
+
+      <div id="database-checklist" class="hidden">
+        <h3>Datenbank einrichten</h3>
+        <div class="checklist" data-group="database">
+          <div class="checkbox-item"><input type="checkbox" id="db1"><span for="db1">Datenbank und User angelegt</span></div>
+          <div class="checkbox-item"><input type="checkbox" id="db2"><span for="db2">Tabellen für Content angelegt</span></div>
+          <div class="checkbox-item"><input type="checkbox" id="db3"><span for="db3">DB-Verbindung in PHP-Endpunkten konfiguriert</span></div>
+          <div class="checkbox-item"><input type="checkbox" id="db4"><span for="db4">SQL-Backups / Migrationen geplant</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <span>📝</span> Phase 4: Content & Seiten
+      </h2>
+      <div class="checklist" data-group="content">
+        <div class="checkbox-item"><input type="checkbox" id="co1"><span for="co1">Content-Schema definiert</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="co2"><span for="co2">Routen erstellt (Start, Leistungen, Referenzen, Kontakt, Impressum, Datenschutz, Admin)</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="co3"><span for="co3">Admin-Panel Tabs eingerichtet</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="co4"><span for="co4">ImageField für alle Bildbereiche hinzugefügt</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <span>🔍</span> Phase 5: SEO & Sicherheit
+      </h2>
+      <div class="checklist" data-group="seo">
+        <div class="checkbox-item"><input type="checkbox" id="s1"><span for="s1">Meta-Tags für alle Routen definiert</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="s2"><span for="s2">JSON-LD in SiteChrome.tsx angepasst</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="s3"><span for="s3">vercel.json angepasst (CSP, Backend-Domain)</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="s4"><span for="s4">Impressum & Datenschutz: noindex</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <span>🚀</span> Phase 6: Build & Deployment
+      </h2>
+      <div class="checklist" data-group="deploy">
+        <div class="checkbox-item"><input type="checkbox" id="de1"><span for="de1">npm install ausgeführt</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="de2"><span for="de2">npm run build erfolgreich</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="de3"><span for="de3">Prerendered HTML geprüft</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="de4"><span for="de4">Auf Vercel deployed</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="de5"><span for="de5">Backend auf Kunden-Server getestet</span></div>
+        <div class="checkbox-item"><input type="checkbox" id="de6"><span for="de6">Bild-Upload inkl. Thumbnail getestet</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <span>📋</span> Notizen
+      </h2>
+      <textarea id="notes" data-save placeholder="Offene Punkte, Ideen, Besonderheiten..."></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="exportData()">💾 Exportieren (JSON)</button>
+      <button class="btn btn-primary" onclick="importData()">📂 Importieren (JSON)</button>
+      <button class="btn btn-danger" onclick="resetData()">🗑️ Zurücksetzen</button>
+    </div>
+
+    <div class="footer">
+      Status wird automatisch im Browser (localStorage) gespeichert.<br>
+      Mit „Exportieren“ kannst du den Stand als JSON sichern oder an ein anderes Tool übergeben.
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'projekt01-dashboard';
+
+    function toggleDatabaseFields() {
+      const dbSelect = document.getElementById('database');
+      const dbFields = document.getElementById('database-fields');
+      const dbChecklist = document.getElementById('database-checklist');
+      const isDatabase = dbSelect && dbSelect.value === 'database';
+      if (dbFields) dbFields.classList.toggle('hidden', !isDatabase);
+      if (dbChecklist) dbChecklist.classList.toggle('hidden', !isDatabase);
+    }
+
+    function loadData() {
+      try {
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+
+        // Textfelder
+        document.querySelectorAll('[data-save]').forEach(el => {
+          if (data[el.id] !== undefined) el.value = data[el.id];
+        });
+
+        // Checkboxen
+        if (data.checkboxes) {
+          document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = !!data.checkboxes[cb.id];
+          });
+        }
+      } catch (e) {
+        console.error('Fehler beim Laden:', e);
+      }
+      toggleDatabaseFields();
+      updateProgress();
+    }
+
+    function saveData() {
+      const data = { checkboxes: {} };
+      document.querySelectorAll('[data-save]').forEach(el => {
+        data[el.id] = el.value;
+      });
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        data.checkboxes[cb.id] = cb.checked;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const visibleCbs = Array.from(document.querySelectorAll('input[type="checkbox"]')).filter(cb => {
+        const item = cb.closest('.checkbox-item');
+        const parent = cb.closest('#database-checklist');
+        // Nur zählen, wenn das Element selbst sichtbar ist und nicht in einer hidden-Parent liegt
+        return item && item.offsetParent !== null && (!parent || !parent.classList.contains('hidden'));
+      });
+      const total = visibleCbs.length;
+      const checked = visibleCbs.filter(cb => cb.checked).length;
+      const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
+      document.getElementById('progress-fill').style.width = percent + '%';
+      document.getElementById('progress-text').textContent = percent + '%';
+
+      document.querySelectorAll('.checkbox-item').forEach(item => {
+        const cb = item.querySelector('input[type="checkbox"]');
+        if (cb.checked) item.classList.add('checked');
+        else item.classList.remove('checked');
+      });
+    }
+
+    function exportData() {
+      const data = localStorage.getItem(STORAGE_KEY) || '{}';
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'projekt-dashboard-status.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            JSON.parse(ev.target.result);
+            localStorage.setItem(STORAGE_KEY, ev.target.result);
+            loadData();
+            alert('Status erfolgreich importiert.');
+          } catch (err) {
+            alert('Ungültige JSON-Datei.');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    function resetData() {
+      if (confirm('Wirklich alles zurücksetzen?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        document.querySelectorAll('[data-save]').forEach(el => el.value = '');
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        updateProgress();
+      }
+    }
+
+    document.querySelectorAll('[data-save]').forEach(el => {
+      el.addEventListener('input', saveData);
+    });
+
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', saveData);
+    });
+
+    document.querySelectorAll('.checkbox-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'INPUT') {
+          const cb = item.querySelector('input[type="checkbox"]');
+          cb.checked = !cb.checked;
+          saveData();
+        }
+      });
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
