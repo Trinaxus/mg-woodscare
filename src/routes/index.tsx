@@ -11,6 +11,7 @@ import {
   MapPin,
   Leaf,
   Instagram,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,6 +28,8 @@ import { ContentBackground } from "@/components/BackgroundPattern";
 import { ParallaxImage } from "@/components/ParallaxImage";
 import { useContent } from "@/lib/content";
 import { defaultContent } from "@/data/defaultContent";
+import { useState, useEffect, useMemo } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -51,6 +54,138 @@ const iconMap: Record<string, LucideIcon> = {
   Leaf,
   Horse: Sprout, // Lucide hat kein Pferd – nutzen Sprout als Naturersatz
 };
+
+function ReviewSlider({ reviews }: { reviews: typeof defaultContent.reviews }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(3);
+
+  useEffect(() => {
+    function updateVisibleCount() {
+      const width = window.innerWidth;
+      if (width < 768) {
+        setVisibleCount(1);
+      } else if (width < 1024) {
+        setVisibleCount(2);
+      } else {
+        setVisibleCount(3);
+      }
+    }
+    updateVisibleCount();
+    window.addEventListener("resize", updateVisibleCount);
+    return () => window.removeEventListener("resize", updateVisibleCount);
+  }, []);
+
+  const maxIndex = useMemo(() => {
+    return Math.max(0, reviews.items.length - visibleCount);
+  }, [reviews.items.length, visibleCount]);
+
+  useEffect(() => {
+    if (currentIndex > maxIndex) {
+      setCurrentIndex(maxIndex);
+    }
+  }, [maxIndex, currentIndex]);
+
+  function prev() {
+    setCurrentIndex((i) => Math.max(0, i - 1));
+  }
+
+  function next() {
+    setCurrentIndex((i) => Math.min(maxIndex, i + 1));
+  }
+
+  const slidePercent = 100 / visibleCount;
+
+  return (
+    <section className="border-y border-border bg-card/40">
+      <div className="mx-auto max-w-7xl px-6 py-20">
+        <ScrollReveal>
+          <div className="text-center">
+            <span className="text-xs font-medium uppercase tracking-widest text-primary">Bewertungen</span>
+            <h2 className="mt-3 font-display text-3xl font-semibold md:text-4xl">{reviews.title}</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/75">{reviews.subtitle}</p>
+          </div>
+        </ScrollReveal>
+
+        <div className="relative mt-12 pb-20 md:pb-0">
+          <div className="overflow-hidden py-4">
+            <div
+              className="flex transition-transform duration-500 ease-out"
+              style={{ transform: `translateX(-${currentIndex * slidePercent}%)` }}
+            >
+              {reviews.items.map((review, i) => (
+                <div
+                  key={review.name + i}
+                  className="w-full shrink-0 px-3 md:w-1/2 lg:w-1/3"
+                  style={{ flex: `0 0 ${slidePercent}%` }}
+                >
+                  <div className="h-full rounded-3xl border border-border bg-card p-6 shadow-card">
+                    <div className="flex items-center gap-4">
+                      {review.image ? (
+                        <img
+                          src={review.image}
+                          alt={review.name}
+                          className="h-12 w-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary font-semibold">
+                          {review.name ? review.name.split(/\s+/).pop()?.charAt(0).toUpperCase() : "?"}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-display text-lg font-semibold">{review.name}</p>
+                        <p className="text-xs text-muted-foreground">{review.role}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center gap-0.5 text-primary">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className="h-4 w-4"
+                          fill={star <= review.rating ? "currentColor" : "none"}
+                          strokeWidth={star <= review.rating ? 0 : 1.5}
+                        />
+                      ))}
+                    </div>
+                    <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{review.text}</p>
+                    {review.date && <p className="mt-4 text-xs text-muted-foreground">{review.date}</p>}
+                    {review.source === "google" && (
+                      <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs text-primary">
+                        <span>★</span> Google-Bewertung
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {reviews.items.length > visibleCount && (
+            <>
+              <button
+                type="button"
+                onClick={prev}
+                disabled={currentIndex === 0}
+                className="absolute -bottom-14 left-1/2 grid h-10 w-10 -translate-x-[calc(50%+2.5rem)] place-items-center rounded-full border border-border bg-background shadow-sm transition hover:bg-muted disabled:opacity-40 md:left-0 md:top-1/2 md:-translate-y-1/2 md:-translate-x-10 lg:-translate-x-16"
+                aria-label="Vorherige Bewertungen"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={next}
+                disabled={currentIndex >= maxIndex}
+                className="absolute -bottom-14 left-1/2 grid h-10 w-10 translate-x-[calc(50%-2.5rem)] place-items-center rounded-full border border-border bg-background shadow-sm transition hover:bg-muted disabled:opacity-40 md:left-auto md:right-0 md:top-1/2 md:-translate-y-1/2 md:translate-x-10 lg:translate-x-16"
+                aria-label="Nächste Bewertungen"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function LandingPage() {
   const { content } = useContent();
@@ -179,7 +314,7 @@ function LandingPage() {
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {content.ueberUns.team.map((m, i) => (
               <ScrollReveal key={m.name} delay={i * 100}>
-                <div className="h-full rounded-2xl border border-border bg-background/60 p-6">
+                <div className="h-full rounded-2xl border border-border bg-background/60 p-6 shadow-card">
                   <div className="flex items-center gap-4">
                     <TeamAvatar name={m.name} image={m.image} size="lg" />
                     <div className="min-w-0">
@@ -261,6 +396,11 @@ function LandingPage() {
           </ScrollReveal>
         </div>
       </section>
+      )}
+
+      {/* REVIEWS */}
+      {content.reviews.items.length > 0 && (
+        <ReviewSlider reviews={content.reviews} />
       )}
 
       {/* INSTAGRAM FEED */}

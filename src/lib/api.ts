@@ -9,6 +9,8 @@ export interface ApiResponse<T = any> {
   message?: string;
   data?: T;
   timestamp?: string;
+  items?: T;
+  lastSynced?: string;
 }
 
 export interface UploadResponse {
@@ -82,6 +84,20 @@ export class ApiClient {
     return this.request('/content.php', {
       method: 'PUT',
       body: JSON.stringify(data),
+    });
+  }
+
+  // Google Reviews API
+  async refreshGoogleReviews(apiKey: string, placeId: string): Promise<ApiResponse> {
+    return this.request('/google-reviews.php', {
+      method: 'POST',
+      body: JSON.stringify({ apiKey, placeId }),
+    });
+  }
+
+  async fetchGoogleReviews(): Promise<ApiResponse> {
+    return this.request('/google-reviews.php', {
+      method: 'GET',
     });
   }
 

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState, useEffect } from "react";
-import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud, Instagram, Play, ChevronDown, TreeDeciduous, TreePine, Axe, Hammer, Wrench, Scissors, Truck, Droplets, Wind, Sun, Snowflake, Umbrella, Flame, Leaf, Sprout, Flower, Trees, Warehouse, Factory, Home, Building, ShieldCheck, Shield, BadgeCheck, HardHat, Ruler, Recycle, Trash2 } from "lucide-react";
+import { Download, Upload, LogOut, RotateCcw, Save, KeyRound, Cloud, Instagram, Play, ChevronDown, TreeDeciduous, TreePine, Axe, Hammer, Wrench, Scissors, Truck, Droplets, Wind, Sun, Snowflake, Umbrella, Flame, Leaf, Sprout, Flower, Trees, Warehouse, Factory, Home, Building, ShieldCheck, Shield, BadgeCheck, HardHat, Ruler, Recycle, Trash2, Star } from "lucide-react";
 
 import { SiteFooter } from "@/components/SiteChrome";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -36,6 +36,7 @@ const TABS = [
   { id: "ueberUns", label: "Über uns / Team" },
   { id: "features", label: "Sägewerk / Brennholz" },
   { id: "referenzen", label: "Referenzen" },
+  { id: "reviews", label: "Bewertungen" },
   { id: "kontakt", label: "Kontakt" },
   { id: "social", label: "Social" },
   { id: "instagram", label: "Instagram" },
@@ -122,6 +123,9 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [uploadingTeamIndex, setUploadingTeamIndex] = useState<number | null>(null);
   const [uploadingKey, setUploadingKey] = useState<string | null>(null);
+  const [googleApiKey, setGoogleApiKey] = useState<string>("");
+  const [googlePlaceId, setGooglePlaceId] = useState<string>(draft.settings?.googlePlaceId || "");
+  const [googleLoading, setGoogleLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const update = <K extends keyof SiteContent>(key: K, value: SiteContent[K]) => {
@@ -281,6 +285,33 @@ function AdminDashboard() {
     setTimeout(() => setNotice(null), 2500);
   };
 
+  const syncGoogleReviews = async () => {
+    if (!googleApiKey.trim() || !googlePlaceId.trim()) {
+      setNotice("Bitte API-Key und Place ID eingeben.");
+      setTimeout(() => setNotice(null), 3000);
+      return;
+    }
+    setGoogleLoading(true);
+    try {
+      // Speichert API-Key + Place ID auf dem Server
+      await api.refreshGoogleReviews(googleApiKey, googlePlaceId);
+      // Ruft Bewertungen ab und speichert sie in content.json
+      const result = await api.fetchGoogleReviews();
+      if (result.success && result.items) {
+        update("reviews", { ...draft.reviews, items: result.items, subtitle: "Echte Google-Bewertungen" });
+        update("settings", { ...draft.settings, googlePlaceId, reviewsLastSynced: result.lastSynced || new Date().toISOString() });
+        setNotice(`Google-Bewertungen aktualisiert: ${result.message}`);
+      } else {
+        setNotice(result.error || "Fehler beim Abrufen der Bewertungen.");
+      }
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Fehler beim Abrufen der Bewertungen.");
+    } finally {
+      setGoogleLoading(false);
+      setTimeout(() => setNotice(null), 4000);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="fixed top-0 z-50 w-full border-b border-border/60 bg-background/70 backdrop-blur-xl">
@@ -352,6 +383,7 @@ function AdminDashboard() {
             { id: "ueberUns", label: "Über uns / Team" },
             { id: "features", label: "Sägewerk / Brennholz" },
             { id: "referenzen", label: "Referenzen" },
+            { id: "reviews", label: "Bewertungen" },
             { id: "kontakt", label: "Kontakt" },
           ]} onSelect={setTab} />
           <TabButton id="social" label="Social" tab={tab} setTab={setTab} />
@@ -627,6 +659,90 @@ function AdminDashboard() {
                 <div className="flex flex-col gap-3 w-full">
                   <TextField label="Titel" value={item.title} onChange={(v) => set({ ...item, title: v })} />
                   <TextArea label="Text" value={item.text} onChange={(v) => set({ ...item, text: v })} />
+                </div>
+              )}
+            />
+          </Card>
+        )}
+
+        {tab === "reviews" && (
+          <Card title="Bewertungen">
+            <TextField label="Abschnittstitel" value={draft.reviews.title} onChange={(v) => update("reviews", { ...draft.reviews, title: v })} />
+            <TextArea label="Untertitel" value={draft.reviews.subtitle} onChange={(v) => update("reviews", { ...draft.reviews, subtitle: v })} />
+
+            <div className="my-6 h-px bg-border" />
+            <p className="text-sm font-medium">Google-Bewertungen automatisch abrufen</p>
+            <p className="text-xs text-muted-foreground">
+              Trage deinen Google Cloud API-Key und die Place ID ein. Der API-Key wird sicher auf dem Server gespeichert und nicht in content.json abgelegt.
+            </p>
+            <TextField
+              label="Google API-Key"
+              value={googleApiKey}
+              onChange={setGoogleApiKey}
+              placeholder="AIza..."
+            />
+            <TextField
+              label="Google Place ID"
+              value={googlePlaceId}
+              onChange={(v) => {
+                setGooglePlaceId(v);
+                update("settings", { ...draft.settings, googlePlaceId: v });
+              }}
+              placeholder="ChIJ..."
+            />
+            {draft.settings?.reviewsLastSynced && (
+              <p className="text-xs text-muted-foreground">
+                Letzte Aktualisierung: {new Date(draft.settings.reviewsLastSynced).toLocaleString('de-DE')}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={syncGoogleReviews}
+              disabled={googleLoading}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground transition disabled:opacity-50"
+            >
+              <RotateCcw className={`h-4 w-4 ${googleLoading ? "animate-spin" : ""}`} />
+              {googleLoading ? "Aktualisiere..." : "Google-Bewertungen abrufen"}
+            </button>
+
+            <div className="my-6 h-px bg-border" />
+            <ListEditor
+              items={draft.reviews.items}
+              onChange={(items) => update("reviews", { ...draft.reviews, items })}
+              blank={{ name: "", role: "", text: "", rating: 5, source: "manual", image: "", date: "" }}
+              render={(item, set, index) => (
+                <div className="grid gap-3">
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <TextField label="Name" value={item.name} onChange={(v) => set({ ...item, name: v })} />
+                    <TextField label="Rolle / Quelle" value={item.role} onChange={(v) => set({ ...item, role: v })} />
+                  </div>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <TextField label="Datum (optional)" value={item.date || ""} onChange={(v) => set({ ...item, date: v })} />
+                    <StarRatingInput
+                      label="Bewertung (1–5 Sterne)"
+                      value={item.rating}
+                      onChange={(rating) => set({ ...item, rating })}
+                    />
+                  </div>
+                  <TextArea label="Bewertungstext" value={item.text} onChange={(v) => set({ ...item, text: v })} />
+                  <select
+                    value={item.source}
+                    onChange={(e) => set({ ...item, source: e.target.value as 'google' | 'manual' })}
+                    className="w-full rounded-xl border border-border bg-background/60 px-4 py-2.5 text-sm outline-none focus:border-primary"
+                  >
+                    <option value="google">Google-Bewertung</option>
+                    <option value="manual">Manuelle Bewertung</option>
+                  </select>
+                  <ImageField
+                    label="Profilbild (optional)"
+                    url={item.image || ""}
+                    uploading={uploadingKey === `reviews.items.${index}.image`}
+                    onUpload={(file) =>
+                      uploadSectionImage("reviews", `items.${index}.image`, file, (url) => set({ ...item, image: url }))
+                    }
+                    onClear={() => set({ ...item, image: "" })}
+                    aspect="square"
+                  />
                 </div>
               )}
             />
@@ -1446,6 +1562,36 @@ function IconPicker({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function StarRatingInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (rating: number) => void;
+}) {
+  return (
+    <div>
+      <span className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        {label}
+      </span>
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => onChange(star)}
+            className={`rounded p-1 transition-colors ${star <= value ? "text-primary" : "text-muted-foreground/40 hover:text-muted-foreground"}`}
+          >
+            <Star className="h-5 w-5" fill={star <= value ? "currentColor" : "none"} />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

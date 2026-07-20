@@ -41,3 +41,6 @@ app.config.timestamp_*.js
 
 # Instagram PHP proxy config (contains access token)
 server/api/instagram.config.php
+
+# Google API credentials
+server/config/google.config.php

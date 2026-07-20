@@ -84,7 +84,12 @@ function KontaktPage() {
                   <Phone className="h-6 w-6" />
                 </div>
                 <h3 className="font-display text-xl font-semibold">Telefon</h3>
-                <p className="mt-3 text-foreground/75">{content.kontakt.phone}</p>
+                <a
+                  href={`tel:${content.kontakt.phone}`}
+                  className="mt-3 block text-foreground/75 transition-colors hover:text-primary"
+                >
+                  {content.kontakt.phone}
+                </a>
                 <p className="mt-2 text-sm text-muted-foreground">Notdienst 24/7</p>
               </div>
               <div className="rounded-3xl border border-border bg-card p-8 shadow-card">
@@ -92,7 +97,12 @@ function KontaktPage() {
                   <Mail className="h-6 w-6" />
                 </div>
                 <h3 className="font-display text-xl font-semibold">E-Mail</h3>
-                <p className="mt-3 text-foreground/75">{content.kontakt.email}</p>
+                <a
+                  href={`mailto:${content.kontakt.email}`}
+                  className="mt-3 block text-foreground/75 transition-colors hover:text-primary"
+                >
+                  {content.kontakt.email}
+                </a>
                 <p className="mt-2 text-sm text-muted-foreground">Antwort innerhalb 24h</p>
               </div>
               <div className="rounded-3xl border border-border bg-card p-8 shadow-card">
@@ -204,10 +214,10 @@ function KontaktPage() {
                 <Phone className="h-4 w-4" /> {content.kontakt.phone}
               </a>
               <a
-                href="/"
+                href={`mailto:${content.kontakt.email}`}
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-6 py-3 font-medium backdrop-blur transition-colors hover:bg-card"
               >
-                Zurück zur Startseite
+                <Mail className="h-4 w-4" /> {content.kontakt.email}
               </a>
             </div>
           </div>

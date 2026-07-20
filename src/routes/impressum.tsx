@@ -46,8 +46,18 @@ function ImpressumPage() {
             </Section>
 
             <Section title="Kontakt">
-              <p>Telefon: {i.phone}</p>
-              <p>E-Mail: {i.email}</p>
+              <p>
+                Telefon:{" "}
+                <a href={`tel:${i.phone}`} className="hover:text-primary">
+                  {i.phone}
+                </a>
+              </p>
+              <p>
+                E-Mail:{" "}
+                <a href={`mailto:${i.email}`} className="hover:text-primary">
+                  {i.email}
+                </a>
+              </p>
             </Section>
 
             <Section title="Registereintrag">

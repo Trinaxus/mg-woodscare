@@ -83,6 +83,19 @@ export interface SiteContent {
     tiktok: string;
     linkedin: string;
   };
+  reviews: {
+    title: string;
+    subtitle: string;
+    items: {
+      name: string;
+      role: string;
+      text: string;
+      rating: number;
+      source: 'google' | 'manual';
+      image?: string;
+      date?: string;
+    }[];
+  };
   impressum: {
     company: string;
     owner: string;
@@ -101,6 +114,7 @@ export interface SiteContent {
   datenschutz: {
     intro: string;
     verantwortlich: string;
+    hosting: string;
     serverLog: string;
     kontaktformular: string;
     cookies: string;
@@ -120,6 +134,10 @@ export interface SiteContent {
     homeDescription?: string;
     leistungenDescription?: string;
     leistungenKeywords?: string;
+  };
+  settings?: {
+    googlePlaceId?: string;
+    reviewsLastSynced?: string;
   };
 }
 
@@ -197,6 +215,11 @@ export const defaultContent: SiteContent = {
     tiktok: "",
     linkedin: "",
   },
+  reviews: {
+    title: "Das sagen unsere Kunden",
+    subtitle: "Echte Bewertungen aus Google und von zufriedenen Kunden",
+    items: [],
+  },
   impressum: {
     company: "",
     owner: "",
@@ -215,6 +238,7 @@ export const defaultContent: SiteContent = {
   datenschutz: {
     intro: "",
     verantwortlich: "",
+    hosting: "",
     serverLog: "",
     kontaktformular: "",
     cookies: "",
@@ -234,5 +258,9 @@ export const defaultContent: SiteContent = {
     homeDescription: "",
     leistungenDescription: "",
     leistungenKeywords: "",
+  },
+  settings: {
+    googlePlaceId: "",
+    reviewsLastSynced: "",
   },
 };
