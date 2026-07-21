@@ -9,10 +9,10 @@ export default defineConfig({
     port: 8080,
     proxy: {
       '/server/api': {
-        target: 'https://tubox.de',
+        target: 'https://api.mg-woodscare.tubox.de',
         changeOrigin: true,
         secure: true,
-        rewrite: (path) => path.replace(/^\/server\/api/, '/mg_woodscare/server/api'),
+        rewrite: (path) => path.replace(/^\/server\/api/, '/api'),
       },
     },
   },

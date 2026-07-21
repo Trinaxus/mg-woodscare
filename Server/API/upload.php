@@ -72,7 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'tubox.de';
-    $baseUrl = $protocol . '://' . $host . '/mg_woodscare';
+    if ($host === 'api.mg-woodscare.tubox.de') {
+        $baseUrl = $protocol . '://' . $host;
+    } else {
+        $baseUrl = $protocol . '://' . $host . '/mg_woodscare';
+    }
     $url = $baseUrl . '/server/upload' . ($folder ? '/' . $folder : '') . '/' . $filename;
     $thumbnailUrl = $baseUrl . '/server/upload/previews' . ($folder ? '/' . $folder : '') . '/' . $filename;
     
